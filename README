@@ -17,3 +17,7 @@ d. Run!!!
 3. Fix "program g++ not found in path"
 # apt-get install g++
 - Menu: Window/Preferences/C/C++/Build/Settings/Discovery --> Restore Defaults
+
+4. Linking with a pthreads support library
+Reference:
+http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-threads/comment-page-1/
