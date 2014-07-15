@@ -1,13 +1,19 @@
 MailPantryc
 ===========
-1. Use libmilter to compile a filter
+1. Add C/C++ IDE (CDT) plugin
+http://download.eclipse.org/tools/cdt/releases/8.4
+
+2. Use libmilter to compile a filter
 a. Installing libmilter
 # apt-get install libmilter1.0.1 libmilter1.0.1-dbg libmilter-dev 
 b. Add libraries (-l) and Library search path (-L) to project
 - In the project properties, go to: C/C++ Build --> Settings
 Then on "Tool Settings" tab, select "Libraries" under "GCC C Linker"
 - Add library "milter"
-- Add library seach path "/usr/lib/libmilter"
+- Add Library search path "/usr/lib/libmilter"
 c. Right-click on project, choose Build Project
 d. Run!!!
 
+3. Fix "program g++ not found in path"
+# apt-get install g++
+- Menu: Window/Preferences/C/C++/Build/Settings/Discovery --> Restore Defaults

@@ -42,6 +42,7 @@ sfsistat xxfi_connect(ctx, hostname, hostaddr)
 	/* save the private data */
 	smfi_setpriv(ctx, priv);
 	ident = smfi_getsymval(ctx, "_");
+	printf("%s\n",ident); // DEBUG
 	if (ident == NULL)
 		ident = "???";
 	if ((priv->xxfi_connectfrom = strdup(ident)) == NULL) {
@@ -114,6 +115,13 @@ sfsistat xxfi_envfrom(ctx, argv)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
+
+	// DEBUG
+    int fno = fileno(priv->xxfi_fp);
+    char proclnk[0xFFF];
+    sprintf(proclnk, "/proc/self/fd/%d", fno);
+    printf("%s\n",proclnk);
+
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
