@@ -121,6 +121,7 @@ sfsistat xxfi_envfrom(ctx, argv)
     char proclnk[0xFFF];
     sprintf(proclnk, "/proc/self/fd/%d", fno);
     printf("%s\n",proclnk);
+    //
 
 	/* count the arguments */
 	while (*argv++ != NULL)
@@ -140,6 +141,7 @@ sfsistat xxfi_envfrom(ctx, argv)
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
+
 sfsistat xxfi_envrcpt(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	struct mlfiPriv *priv = MLFIPRIV;
@@ -348,6 +350,7 @@ int main(argc, argv)
 				unlink(optarg + 5);
 			else if (strncasecmp(optarg, "local:", 6) == 0)
 				unlink(optarg + 6);
+			printf("connected!\n"); // DEBUG
 			setconn = TRUE;
 			break;
 		case 't':

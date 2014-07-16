@@ -6,11 +6,14 @@ http://download.eclipse.org/tools/cdt/releases/8.4
 2. Use libmilter to compile a filter
 a. Installing libmilter
 # apt-get install libmilter1.0.1 libmilter1.0.1-dbg libmilter-dev 
-b. Add libraries (-l) and Library search path (-L) to project
+b. Add libraries (-l), Library search path (-L) and Include paths (-I) to project
 - In the project properties, go to: C/C++ Build --> Settings
 Then on "Tool Settings" tab, select "Libraries" under "GCC C Linker"
 - Add library "milter"
 - Add Library search path "/usr/lib/libmilter"
+Put the include and Sendmail directories in include path
+- Select "Includes" under "GCC C Linker"
+- Add Include paths: "usr/include"
 c. Right-click on project, choose Build Project
 d. Run!!!
 
