@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
-#include <libmilter/mfapi.h>
+#include "libmilter/mfapi.h"
 
 #ifndef bool
 # define bool   int
@@ -42,7 +42,7 @@ sfsistat xxfi_connect(ctx, hostname, hostaddr)
 	/* save the private data */
 	smfi_setpriv(ctx, priv);
 	ident = smfi_getsymval(ctx, "_");
-	printf("%s\n",ident); // DEBUG
+	printf("connect: %s\n", ident); // DEBUG
 	if (ident == NULL)
 		ident = "???";
 	if ((priv->xxfi_connectfrom = strdup(ident)) == NULL) {
@@ -70,6 +70,7 @@ sfsistat xxfi_helo(ctx, helohost)
 		return SMFIS_TEMPFAIL;
 	}
 	snprintf(buf, len, "%s, %s", helohost, tls);
+	printf("helo: %s\n", buf);
 	if (priv->xxfi_helofrom != NULL)
 		free(priv->xxfi_helofrom);
 	priv->xxfi_helofrom = buf;
@@ -117,11 +118,11 @@ sfsistat xxfi_envfrom(ctx, argv)
 	}
 
 	// DEBUG
-    int fno = fileno(priv->xxfi_fp);
-    char proclnk[0xFFF];
-    sprintf(proclnk, "/proc/self/fd/%d", fno);
-    printf("%s\n",proclnk);
-    //
+	int fno = fileno(priv->xxfi_fp);
+	char proclnk[0xFFF];
+	sprintf(proclnk, "/proc/self/fd/%d", fno);
+	printf("%s\n", proclnk);
+	//
 
 	/* count the arguments */
 	while (*argv++ != NULL)
@@ -337,7 +338,8 @@ int main(argc, argv)
 				(void) fprintf(stderr, "Illegal conn: %s\n", optarg);
 				exit(EX_USAGE);
 			}
-			if (smfi_setconn(optarg) == MI_FAILURE) {
+			if (smfi_setconn("local:25") == MI_FAILURE) {
+			//if (smfi_setconn(optarg) == MI_FAILURE) {
 				(void) fprintf(stderr, "smfi_setconn failed\n");
 				exit(EX_SOFTWARE);
 			}
@@ -350,7 +352,6 @@ int main(argc, argv)
 				unlink(optarg + 5);
 			else if (strncasecmp(optarg, "local:", 6) == 0)
 				unlink(optarg + 6);
-			printf("connected!\n"); // DEBUG
 			setconn = TRUE;
 			break;
 		case 't':
@@ -390,6 +391,7 @@ int main(argc, argv)
 		exit(EX_USAGE);
 	}
 	if (smfi_register(smfilter) == MI_FAILURE) {
+
 		fprintf(stderr, "smfi_register failed\n");
 		exit(EX_UNAVAILABLE);
 	}
