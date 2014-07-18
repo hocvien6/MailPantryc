@@ -42,13 +42,13 @@ sfsistat xxfi_connect(ctx, hostname, hostaddr)
 	/* save the private data */
 	smfi_setpriv(ctx, priv);
 	ident = smfi_getsymval(ctx, "_");
-	printf("connect: %s\n", ident); // DEBUG
 	if (ident == NULL)
 		ident = "???";
 	if ((priv->xxfi_connectfrom = strdup(ident)) == NULL) {
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
+	printf("%s\n",priv->xxfi_connectfrom); // DEBUG
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -70,7 +70,6 @@ sfsistat xxfi_helo(ctx, helohost)
 		return SMFIS_TEMPFAIL;
 	}
 	snprintf(buf, len, "%s, %s", helohost, tls);
-	printf("helo: %s\n", buf);
 	if (priv->xxfi_helofrom != NULL)
 		free(priv->xxfi_helofrom);
 	priv->xxfi_helofrom = buf;
@@ -116,14 +115,6 @@ sfsistat xxfi_envfrom(ctx, argv)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-
-	// DEBUG
-	int fno = fileno(priv->xxfi_fp);
-	char proclnk[0xFFF];
-	sprintf(proclnk, "/proc/self/fd/%d", fno);
-	printf("%s\n", proclnk);
-	//
-
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
@@ -338,8 +329,7 @@ int main(argc, argv)
 				(void) fprintf(stderr, "Illegal conn: %s\n", optarg);
 				exit(EX_USAGE);
 			}
-			if (smfi_setconn("local:25") == MI_FAILURE) {
-			//if (smfi_setconn(optarg) == MI_FAILURE) {
+			if (smfi_setconn(optarg) == MI_FAILURE) {
 				(void) fprintf(stderr, "smfi_setconn failed\n");
 				exit(EX_SOFTWARE);
 			}

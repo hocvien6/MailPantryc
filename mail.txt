@@ -1,0 +1,45 @@
+I am interested in Postfix and currently trying to write my own simple milter for Postfix, but I have a problem
+Everthing is ok when testing:
+$ telnet localhost 25
+mail from: sender@localhost
+rcpt to: recipient@localhost
+data
+from: apple@store.com
+to: microsoft@google.com
+subject: Hi there
+an apple a day, keep doctor away
+.
+quit
+
+("sender" and "recipient" are user in my linux system)
+And here is last output from /var/mail/recipient
+
+From sender@localhost  Fri Jul 18 11:08:46 2014
+Return-Path: <sender@localhost>
+X-Original-To: recipient@localhost
+Delivered-To: recipient@localhost
+Received: from localhost (localhost [127.0.0.1])
+	by hocvien6 (Postfix) with SMTP id 4698A4715F
+	for <recipient@localhost>; Fri, 18 Jul 2014 11:07:40 +0700 (ICT)
+from: apple@store.com
+to: microsoft@google.com
+Message-Id: <20140718040806.4698A4715F@hocvien6>
+Date: Fri, 18 Jul 2014 11:07:40 +0700 (ICT)
+
+an apple a day, keep doctor away
+
+
+I have already installed Postfix 2.9.6, libmilter and had a stand-alone "sample.c" file, copied from
+https://www.milter.org/developers/sample
+
+To compile on Ubuntu 12.04, I used:
+$ gcc -L/usr/lib/libmilter -o sample sample.c -lmilter -lpthread
+
+I followed guide at:
+https://www.milter.org/developers/installation
+http://www.postfix.org/MILTER_README.html
+But I don't know how to plug it into Postfix, when I have only "sample" binary executable file in hands
+
+Did I forget any configuration options at main.cf and master.cf such as "smtpd_milters" etc.?
+Please help me, what should I do?
+I am newbie and... sorry for my bad english ^^...
