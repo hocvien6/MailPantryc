@@ -41,6 +41,9 @@ The general syntax for listening sockets is as follows:
 	inet:host:port
 		Connect to the specified TCP port on the specified local or remote host.
 		The host and port can be specified in numeric or symbolic form.
+Reference:
+http://www.postfix.org/MILTER_README.html
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=496003
 
 2. Plug MailPantryc into Postfix
 1. Create socket
