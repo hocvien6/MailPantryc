@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
-#include "libmilter/mfapi.h"
+#include <libmilter/mfapi.h>
 
 #ifndef bool
 # define bool   int
@@ -48,7 +48,7 @@ sfsistat xxfi_connect(ctx, hostname, hostaddr)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	printf("%s\n",priv->xxfi_connectfrom); // DEBUG
+	printf("%s\n",hostname); // DEBUG
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -130,6 +130,7 @@ sfsistat xxfi_envfrom(ctx, argv)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
+	printf("%s\n",mailaddr);
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }

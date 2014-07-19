@@ -1,5 +1,7 @@
 MailPantryc
-===========
+==============
+DO THESE FIRST
+
 1. Add C/C++ IDE (CDT) plugin
 http://download.eclipse.org/tools/cdt/releases/8.4
 
@@ -11,16 +13,70 @@ b. Add libraries (-l), Library search path (-L) and Include paths (-I) to projec
 Then on "Tool Settings" tab, select "Libraries" under "GCC C Linker"
 - Add library "milter"
 - Add Library search path "/usr/lib/libmilter"
-Put the include and Sendmail directories in include path
-- Select "Includes" under "GCC C Linker"
-- Add Include paths: "usr/include"
 c. Right-click on project, choose Build Project
 d. Run!!!
+Ctrl + F11 from Eclipse (optional: Run/Run Configurations...)
+or
+$ ./MailPantryc [option...]
 
 3. Fix "program g++ not found in path"
 # apt-get install g++
 - Menu: Window/Preferences/C/C++/Build/Settings/Discovery --> Restore Defaults
 
-4. Linking with a pthreads support library
+4. Linking with a pthread support library
 Reference:
 http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-threads/comment-page-1/
+
+==============
+PLUG MAILPANTRYC INTO POSTFIX
+1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter applications):
+smtpd_milters = unix:<path to socket>
+
+Note:
+The general syntax for listening sockets is as follows:
+	unix:pathname																				#	!!!
+		Connect to the local UNIX-domain server that is bound to the specified pathname.		#	PAY
+		If the smtpd(8) or cleanup(8) process runs chrooted,									#	ATTENTION
+		an absolute pathname is interpreted relative to the Postfix queue directory.			#	!!!
+	inet:host:port
+		Connect to the specified TCP port on the specified local or remote host.
+		The host and port can be specified in numeric or symbolic form.
+
+2. Plug MailPantryc into Postfix
+1. Create socket
+$ rm <path to socket>												# remove if socket is existing
+$ ./MailPantryc -p <path to socket>									# run MailPantryc with new socket
+$ chmod 777 <path to socket>										# grant permission on new socket
+b. Restart postfix
+# service postfix restart
+
+3. Example:
+Append to /etc/postfix/main.cf
+smtpd_milters = unix:/MailPantryc/f1.sock							# relative path
+
+Run:
+# mkdir /var/spool/postfix/MailPantryc								# create new directory to put socket
+or
+# rm /var/spool/postfix/MailPantryc/f1.sock							# remove old socket
+then:
+# ./MailPantryc -p /var/spool/postfix/MailPantryc/f1.sock			# run program with new socket
+																	# /var/spool/postfix/ - Postfix queue directory
+Open new Terminal tab and run:
+# chmod 777 /var/spool/postfix/MailPantryc/f1.sock
+# service postfix restart
+
+Test by using telnet:
+$ telnet localhost 25
+[...]
+mail from: apple@store.com
+rcpt to: microsoft@google.com
+[...]
+data
+from: Steve Jobs
+to: Bill Gates
+An apple a day, keep doctor away
+.
+quit
+
+In addition: this program while running will create temporary file at /tmp, to remove them, run:
+# rm /tmp/msg.*
