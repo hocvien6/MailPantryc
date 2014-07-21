@@ -93,4 +93,14 @@ An apple a day, keep doctor away
 quit
 
 In addition: this program while running will create temporary file at /tmp/, to remove them, run:
-# rm /tmp/msg.*
+# rm /tmp/msg*.*
+Or do nothing because the directory is cleared by default at every boot
+Reference:
+http://askubuntu.com/questions/20783/how-is-the-tmp-directory-cleaned-up
+
+==============================
+SEND AN EMAIL WITH ATTACHMENTS
+Install sendEmail:
+# apt-get install sendEmail
+Reference:
+http://backreference.org/2013/05/22/send-email-with-attachments-from-script-or-command-line/

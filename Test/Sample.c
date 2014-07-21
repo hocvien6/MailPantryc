@@ -78,16 +78,9 @@ sfsistat xxfi_helo(ctx, helohost)
 
 sfsistat xxfi_envfrom(ctx, argv)
 	SMFICTX *ctx;char **argv; {
-	int fd = -1;
 	int argc = 0;
 	struct mlfiPriv *priv = MLFIPRIV;
 	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
-
-	// DEBUG
-	FILE *f = fopen("Running/info.txt","w");
-	fprintf(f,"%s\n",mailaddr);
-	fclose(f);
-	//
 
 #ifdef WIN32
 	char szFilename[MAX_PATH]= {0};
@@ -100,24 +93,20 @@ sfsistat xxfi_envfrom(ctx, argv)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	if ((priv->xxfi_fname = strdup(_tempnam(szFilename, "msg."))) == NULL)
+	if ((priv->xxfi_fname = strdup(_tempnam(szFilename, "msgPantryc."))) == NULL)
 	{
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 #else /* WIN32 */
-	if ((priv->xxfi_fname = strdup("/tmp/msg.XXXXXX")) == NULL) {
-		(void) xxfi_cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
-	if ((fd = mkstemp(priv->xxfi_fname)) == -1) {
+	if ((priv->xxfi_fname = strdup("/tmp/msgPantryc.txt")) == NULL) {
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 
 #endif /* WIN32 */
-	if ((priv->xxfi_fp = fdopen(fd, "w+")) == NULL) {
-		(void) close(fd);
+	if ((priv->xxfi_fp = fopen(priv->xxfi_fname, "w+")) == NULL) {
+		(void) fclose(priv->xxfi_fp);
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -193,6 +182,7 @@ sfsistat xxfi_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
 	struct mlfiPriv *priv = MLFIPRIV;
 	/* output body block to log file */
+	printf("%s\n",bodyp); //DEBUG
 	if (fwrite(bodyp, bodylen, 1, priv->xxfi_fp) != 1) {
 		/* write failed */
 		fprintf(stderr, "Couldn't write file %s: %s\n", priv->xxfi_fname,
