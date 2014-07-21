@@ -104,3 +104,4 @@ Install sendEmail:
 # apt-get install sendEmail
 Reference:
 http://backreference.org/2013/05/22/send-email-with-attachments-from-script-or-command-line/
+http://en.wikipedia.org/wiki/MIME

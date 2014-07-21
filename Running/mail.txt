@@ -1,0 +1,122 @@
+From hocvien6@localhost  Mon Jul 21 15:37:21 2014
+Return-Path: <hocvien6@localhost>
+X-Original-To: forlax@localhost
+Delivered-To: forlax@localhost
+Received: from hocvien6 (localhost [127.0.0.1])
+	(using TLSv1.1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by hocvien6 (Postfix) with ESMTPS id A0F6A47118
+	for <forlax@localhost>; Mon, 21 Jul 2014 15:37:21 +0700 (ICT)
+Message-ID: <770591.427196877-sendEmail@hocvien6>
+From: "hocvien6@localhost" <hocvien6@localhost>
+To: "forlax@localhost" <forlax@localhost>
+Subject: 
+Date: Mon, 21 Jul 2014 08:37:21 +0000
+X-Mailer: sendEmail-1.56
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="----MIME delimiter for sendEmail-113581.229307787"
+
+This is a multi-part message in MIME format. To properly display this message you need a MIME-Version 1.0 compliant Email program.
+
+------MIME delimiter for sendEmail-113581.229307787
+Content-Type: text/plain;
+        charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+
+data
+
+------MIME delimiter for sendEmail-113581.229307787
+Content-Type: application/octet-stream;
+        name="cpr1.tar.gz"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cpr1.tar.gz"
+
+H4sIADXRzFMAA+2WS08bMRDHc95PMbckUhQlPILEjXKKxKFSkVCFOJj1gK14PZEfhO2n73hDCQRS
+RFtUIc3vss54/Pe8dhXXBluP033qfRwTZjY7KM/p0eHk6bNwMDk66E339mf70+nkcI/t072j2WEP
+Jh8Y0yM5JhUAeobqO4t+tsvvrf1Pyjz1I6hG/bD+FgytoKVcnSoPcYlqAcHemgSJoGnBoAppXF3Y
+ZCgniKotZxSsKOjqO2Wo+ZjrDuQlJIOgVViMq+o8tKAizKFR7YgfNWWnweMdBsD7pVPWVxdGJd4q
+d8DKoC9xgCbf7y7iW5Lh21js8tRQyPH4qjrnG2JjHQJ17gFuVI3VGaYIDcLCczapyBYpj6jZOi6n
+ApacIYWcDNiHs9hirL6tc2JD37mHCB2qO+yOXp6469wAG6Mlf3wFJYJEuTZAN2sVo7wuAcdfGrVK
+vM3hrMq9RW/OYTrHameWdf9YzD8TK+UvdbIJrjGmTQmL0VNXPOBSdM7VCWtp3nDE1nnXt1L46ivS
+ksuZlFsU/9JlR1nDgIjMcFx9yU+UDblSUa4St2ywbRl2IelAK9/plHGo+ReLPS5HG+twMyZsa9eT
+0q1KcOtcNd5Yj92kcP+ukeOIympepRXiQxu7IYVSuIadZV52zMuL0LYHaNA+Nwx/P1LbwfVPVY4I
+7d+pSvM+c/MG7/oovcd5yB+L0uuXAzHa0bcX3R+92hJHtNhye71Tbw3exyb/LHRQWtvEC+UAvWbP
+na/LOpt/luT//u8iCIIgCIIgCIIgCIIgCIIgCIIgCIIgbPgJTd4qdgAoAAA=
+
+------MIME delimiter for sendEmail-113581.229307787--
+
+
+From hocvien6@localhost  Mon Jul 21 15:42:04 2014
+Return-Path: <hocvien6@localhost>
+X-Original-To: forlax@localhost
+Delivered-To: forlax@localhost
+Received: from hocvien6 (localhost [127.0.0.1])
+	(using TLSv1.1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by hocvien6 (Postfix) with ESMTPS id 550A847118
+	for <forlax@localhost>; Mon, 21 Jul 2014 15:42:04 +0700 (ICT)
+Message-ID: <224887.119696604-sendEmail@hocvien6>
+From: "hocvien6@localhost" <hocvien6@localhost>
+To: "forlax@localhost" <forlax@localhost>
+Subject: 
+Date: Mon, 21 Jul 2014 08:42:04 +0000
+X-Mailer: sendEmail-1.56
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="----MIME delimiter for sendEmail-805250.39865552"
+
+This is a multi-part message in MIME format. To properly display this message you need a MIME-Version 1.0 compliant Email program.
+
+------MIME delimiter for sendEmail-805250.39865552
+Content-Type: text/plain;
+        charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+
+data
+
+------MIME delimiter for sendEmail-805250.39865552
+Content-Type: text/plain;
+        name="lyric.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="lyric.txt"
+
+SXQncyBhbWF6aW5nIGhvdyB5b3UKQ2FuIHNwZWFrIHJpZ2h0IHRvIG15IGhlYXJ0LgpXaXRob3V0
+IHNheWluZyBhIHdvcmQKWW91IGNhbiBsaWdodCB1cCB0aGUgZGFyay4KClRyeSBhcyBJIG1heSwg
+SSBjb3VsZCBuZXZlciBleHBsYWluCldoYXQgSSBoZWFyIHdoZW4geW91IGRvbid0IHNheSBhIHRo
+aW5nLgoKW0Nob3J1czpdClRoZSBzbWlsZSBvbiB5b3VyIGZhY2UKTGV0cyBtZSBrbm93IHRoYXQg
+eW91IG5lZWQgbWUuClRoZXJlJ3MgYSB0cnV0aCBpbiB5b3VyIGV5ZXMKU2F5aW5nIHlvdSdsbCBu
+ZXZlciBsZWF2ZSBtZS4KW0FsYnVtIHZlcnNpb246XSBUaGUgdG91Y2ggb2YgeW91ciBoYW5kIHNh
+eXMgeW91J2xsIGNhdGNoIG1lIHdoZXJldmVyIEkgZmFsbC4KW0xpdmUgdmVyc2lvbjpdIFRoZSB0
+b3VjaCBvZiB5b3VyIGhhbmQgc2F5cyB5b3UnbGwgY2F0Y2ggbWUgd2hlbmV2ZXIgSSBmYWxsLgpZ
+b3Ugc2F5IGl0IGJlc3Qgd2hlbiB5b3Ugc2F5IG5vdGhpbmcgYXQgYWxsLgoKQWxsIGRheSBsb25n
+IEkgY2FuIGhlYXIKUGVvcGxlIHRhbGtpbmcgb3V0IGxvdWQgKG9vb2gpLgpCdXQgd2hlbiB5b3Ug
+aG9sZCBtZSBuZWFyICh5b3UgaG9sZCBtZSBuZWFyKQpZb3UgZHJvd24gb3V0IHRoZSBjcm93ZCAo
+dGhlIGNyb3dkLCB0aGUgY3Jvd2QpLgoKVHJ5IGFzIHRoZXkgbWF5LCB0aGV5IGNhbiBuZXZlciBk
+ZWZpbmUKV2hhdCdzIGJlZW4gc2FpZCBiZXR3ZWVuIHlvdXIgaGVhcnQgYW5kIG1pbmUuCgpbQ2hv
+cnVzOl0KVGhlIHNtaWxlIG9uIHlvdXIgZmFjZQpMZXRzIG1lIGtub3cgdGhhdCB5b3UgbmVlZCBt
+ZS4KVGhlcmUncyBhIHRydXRoIGluIHlvdXIgZXllcwpTYXlpbmcgeW91J2xsIG5ldmVyIGxlYXZl
+IG1lLgpbQWxidW0gdmVyc2lvbjpdIFRoZSB0b3VjaCBvZiB5b3VyIGhhbmQgc2F5cyB5b3UnbGwg
+Y2F0Y2ggbWUgd2hlcmV2ZXIgSSBmYWxsLgpbTGl2ZSB2ZXJzaW9uOl0gVGhlIHRvdWNoIG9mIHlv
+dXIgaGFuZCBzYXlzIHlvdSdsbCBjYXRjaCBtZSB3aGVuZXZlciBJIGZhbGwuCltBbGJ1bSB2ZXJz
+aW9uOl0gWW91IHNheSBpdCBiZXN0ICh5b3Ugc2F5IGl0IGJlc3QpIHdoZW4geW91IHNheSBub3Ro
+aW5nIGF0IGFsbC4KW0xpdmUgdmVyc2lvbjpdICdDYXVzZSB5b3Ugc2F5IGl0IGJlc3QgKHlvdSBz
+YXkgaXQgYmVzdCkgd2hlbiB5b3Ugc2F5IG5vdGhpbmcgYXQgYWxsLgoKW0Nob3J1czpdClRoZSBz
+bWlsZSBvbiB5b3VyIGZhY2UKTGV0cyBtZSBrbm93IHRoYXQgeW91IG5lZWQgbWUuClRoZXJlJ3Mg
+YSB0cnV0aCBpbiB5b3VyIGV5ZXMKU2F5aW5nIHlvdSdsbCBuZXZlciBsZWF2ZSBtZS4KW0FsYnVt
+IHZlcnNpb246XSBUaGUgdG91Y2ggb2YgeW91ciBoYW5kIHNheXMgeW91J2xsIGNhdGNoIG1lIHdo
+ZXJldmVyIEkgZmFsbC4KW0xpdmUgdmVyc2lvbjpdIFRoZSB0b3VjaCBvZiB5b3VyIGhhbmQgc2F5
+cyB5b3UnbGwgY2F0Y2ggbWUgd2hlbmV2ZXIgSSBmYWxsLgpbQWxidW0gdmVyc2lvbjpdIFlvdSBz
+YXkgaXQgYmVzdCAoeW91IHNheSBpdCBiZXN0KSB3aGVuIHlvdSBzYXkgbm90aGluZyBhdCBhbGwu
+CltMaXZlIHZlcnNpb246XSAnQ2F1c2UgeW91IHNheSBpdCBiZXN0ICh5b3Ugc2F5IGl0IGJlc3Qp
+IHdoZW4geW91IHNheSBub3RoaW5nIGF0IGFsbC4KCihZb3Ugc2F5IGl0IGJlc3Qgd2hlbiB5b3Ug
+c2F5IG5vdGhpbmcgYXQgYWxsLgpZb3Ugc2F5IGl0IGJlc3Qgd2hlbiB5b3Ugc2F5IG5vdGhpbmcg
+YXQgYWxsLikKClRoYXQgc21pbGUgb24geW91ciBmYWNlLApbQWxidW0gdmVyc2lvbjpdIFRoZSB0
+cnV0aCBpbiB5b3VyIGV5ZXMsCltMaXZlIHZlcnNpb246XSBUaGUgbG9vayBpbiB5b3VyIGV5ZXMs
+ClRoZSB0b3VjaCBvZiB5b3VyIGhhbmQKTGV0cyBtZSBrbm93IHRoYXQgeW91IG5lZWQgbWUuCgoo
+WW91IHNheSBpdCBiZXN0IHdoZW4geW91IHNheSBub3RoaW5nIGF0IGFsbC4KWW91IHNheSBpdCBi
+ZXN0IHdoZW4geW91IHNheSBub3RoaW5nIGF0IGFsbC4pCgpbTGl2ZSB2ZXJzaW9uIGFkZGl0aW9u
+YWwgZW5kaW5nOl0KVGhlIHNtaWxlIG9uIHlvdXIgZmFjZSwKVGhlIGxvb2sgaW4geW91ciBleWVz
+LApUaGUgdG91Y2ggb2YgeW91ciBoYW5kCkxldHMgbWUga25vdyB0aGF0IHlvdSBuZWVkIG1lLgo=
+
+------MIME delimiter for sendEmail-805250.39865552--
+
+

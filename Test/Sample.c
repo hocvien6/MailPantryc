@@ -15,20 +15,20 @@
 #endif /* ! bool */
 
 struct mlfiPriv {
-	char *xxfi_fname;
-	char *xxfi_connectfrom;
-	char *xxfi_helofrom;
-	FILE *xxfi_fp;
+	char *pantryc_fname;
+	char *pantryc_connectfrom;
+	char *pantryc_helofrom;
+	FILE *pantryc_fp;
 };
 
 #define MLFIPRIV        ((struct mlfiPriv *) smfi_getpriv(ctx))
 
-extern sfsistat xxfi_cleanup(SMFICTX *, bool);
+extern sfsistat pantryc_cleanup(SMFICTX *, bool);
 /* recipients to add and reject (set with -a and -r options) */
 char *add = NULL;
 char *reject = NULL;
 
-sfsistat xxfi_connect(ctx, hostname, hostaddr)
+sfsistat pantryc_connect(ctx, hostname, hostaddr)
 	SMFICTX *ctx;char *hostname;_SOCK_ADDR *hostaddr; {
 	struct mlfiPriv *priv;
 	char *ident;
@@ -44,15 +44,15 @@ sfsistat xxfi_connect(ctx, hostname, hostaddr)
 	ident = smfi_getsymval(ctx, "_");
 	if (ident == NULL)
 		ident = "???";
-	if ((priv->xxfi_connectfrom = strdup(ident)) == NULL) {
-		(void) xxfi_cleanup(ctx, FALSE);
+	if ((priv->pantryc_connectfrom = strdup(ident)) == NULL) {
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_helo(ctx, helohost)
+sfsistat pantryc_helo(ctx, helohost)
 	SMFICTX *ctx;char *helohost; {
 	size_t len;
 	char *tls;
@@ -65,18 +65,18 @@ sfsistat xxfi_helo(ctx, helohost)
 		helohost = "???";
 	len = strlen(tls) + strlen(helohost) + 3;
 	if ((buf = (char*) malloc(len)) == NULL) {
-		(void) xxfi_cleanup(ctx, FALSE);
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	snprintf(buf, len, "%s, %s", helohost, tls);
-	if (priv->xxfi_helofrom != NULL)
-		free(priv->xxfi_helofrom);
-	priv->xxfi_helofrom = buf;
+	if (priv->pantryc_helofrom != NULL)
+		free(priv->pantryc_helofrom);
+	priv->pantryc_helofrom = buf;
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_envfrom(ctx, argv)
+sfsistat pantryc_envfrom(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	int argc = 0;
 	struct mlfiPriv *priv = MLFIPRIV;
@@ -90,46 +90,46 @@ sfsistat xxfi_envfrom(ctx, argv)
 	if (GetTempPath(MAX_PATH, szFilename) == 0)
 	{
 		/* This shouldn't fail */
-		(void) xxfi_cleanup(ctx, FALSE);
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	if ((priv->xxfi_fname = strdup(_tempnam(szFilename, "msgPantryc."))) == NULL)
+	if ((priv->pantryc_fname = strdup(_tempnam(szFilename, "msgPantryc."))) == NULL)
 	{
-		(void) xxfi_cleanup(ctx, FALSE);
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 #else /* WIN32 */
-	if ((priv->xxfi_fname = strdup("/tmp/msgPantryc.txt")) == NULL) {
-		(void) xxfi_cleanup(ctx, FALSE);
+	if ((priv->pantryc_fname = strdup("/tmp/msgPantryc.txt")) == NULL) {
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 
 #endif /* WIN32 */
-	if ((priv->xxfi_fp = fopen(priv->xxfi_fname, "w+")) == NULL) {
-		(void) fclose(priv->xxfi_fp);
-		(void) xxfi_cleanup(ctx, FALSE);
+	if ((priv->pantryc_fp = fopen(priv->pantryc_fname, "w+")) == NULL) {
+		(void) fclose(priv->pantryc_fp);
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
 	/* log the connection information we stored earlier: */
-	if (fprintf(priv->xxfi_fp, "Connect from %s (%s)\n\n", priv->xxfi_helofrom,
-			priv->xxfi_connectfrom) == EOF) {
-		(void) xxfi_cleanup(ctx, FALSE);
+	if (fprintf(priv->pantryc_fp, "Connect from %s (%s)\n\n",
+			priv->pantryc_helofrom, priv->pantryc_connectfrom) == EOF) {
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* log the sender */
-	if (fprintf(priv->xxfi_fp, "FROM %s (%d argument%s)\n",
+	if (fprintf(priv->pantryc_fp, "FROM %s (%d argument%s)\n",
 			mailaddr ? mailaddr : "???", argc, (argc == 1) ? "" : "s") == EOF) {
-		(void) xxfi_cleanup(ctx, FALSE);
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_envrcpt(ctx, argv)
+sfsistat pantryc_envrcpt(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	struct mlfiPriv *priv = MLFIPRIV;
 	char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}");
@@ -140,76 +140,75 @@ sfsistat xxfi_envrcpt(ctx, argv)
 	/* log this recipient */
 	if (reject != NULL && rcptaddr != NULL
 			&& (strcasecmp(rcptaddr, reject) == 0)) {
-		if (fprintf(priv->xxfi_fp, "RCPT %s -- REJECTED\n", rcptaddr) == EOF) {
-			(void) xxfi_cleanup(ctx, FALSE);
+		if (fprintf(priv->pantryc_fp, "RCPT %s -- REJECTED\n", rcptaddr) == EOF) {
+			(void) pantryc_cleanup(ctx, FALSE);
 			return SMFIS_TEMPFAIL;
 		}
 		return SMFIS_REJECT;
 	}
 
-	if (fprintf(priv->xxfi_fp, "RCPT %s (%d argument%s)\n",
+	if (fprintf(priv->pantryc_fp, "RCPT %s (%d argument%s)\n",
 			rcptaddr ? rcptaddr : "???", argc, (argc == 1) ? "" : "s") == EOF) {
-		(void) xxfi_cleanup(ctx, FALSE);
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_header(ctx, headerf, headerv)
+sfsistat pantryc_header(ctx, headerf, headerv)
 	SMFICTX *ctx;char *headerf;unsigned char *headerv; {
 	/* write the header to the log file */
-	if (fprintf(MLFIPRIV->xxfi_fp, "%s: %s\n", headerf, headerv) == EOF) {
-		(void) xxfi_cleanup(ctx, FALSE);
+	if (fprintf(MLFIPRIV->pantryc_fp, "%s: %s\n", headerf, headerv) == EOF) {
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_eoh(ctx)
+sfsistat pantryc_eoh(ctx)
 	SMFICTX *ctx; {
 	/* output the blank line between the header and the body */
-	if (fprintf(MLFIPRIV->xxfi_fp, "\n") == EOF) {
-		(void) xxfi_cleanup(ctx, FALSE);
+	if (fprintf(MLFIPRIV->pantryc_fp, "\n") == EOF) {
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_body(ctx, bodyp, bodylen)
+sfsistat pantryc_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
 	struct mlfiPriv *priv = MLFIPRIV;
 	/* output body block to log file */
-	printf("%s\n",bodyp); //DEBUG
-	if (fwrite(bodyp, bodylen, 1, priv->xxfi_fp) != 1) {
+	printf("%s\n", bodyp); //DEBUG
+	if (fwrite(bodyp, bodylen, 1, priv->pantryc_fp) != 1) {
 		/* write failed */
-		fprintf(stderr, "Couldn't write file %s: %s\n", priv->xxfi_fname,
+		fprintf(stderr, "Couldn't write file %s: %s\n", priv->pantryc_fname,
 				strerror(errno));
-		(void) xxfi_cleanup(ctx, FALSE);
-
+		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_eom(ctx)
+sfsistat pantryc_eom(ctx)
 	SMFICTX *ctx; {
 	bool ok = TRUE;
 	/* change recipients, if requested */
 	if (add != NULL)
 		ok = (smfi_addrcpt(ctx, add) == MI_SUCCESS);
-	return xxfi_cleanup(ctx, ok);
+	return pantryc_cleanup(ctx, ok);
 }
 
-sfsistat xxfi_abort(ctx)
+sfsistat pantryc_abort(ctx)
 	SMFICTX *ctx; {
-	return xxfi_cleanup(ctx, FALSE);
+	return pantryc_cleanup(ctx, FALSE);
 }
 
-sfsistat xxfi_cleanup(ctx, ok)
+sfsistat pantryc_cleanup(ctx, ok)
 	SMFICTX *ctx;
 	bool ok; {
 	sfsistat rstat = SMFIS_CONTINUE;
@@ -220,19 +219,19 @@ sfsistat xxfi_cleanup(ctx, ok)
 	if (priv == NULL)
 		return rstat;
 	/* close the archive file */
-	if (priv->xxfi_fp != NULL && fclose(priv->xxfi_fp) == EOF) {
+	if (priv->pantryc_fp != NULL && fclose(priv->pantryc_fp) == EOF) {
 		/* failed; we have to wait until later */
 		fprintf(stderr, "Couldn't close archive file %s: %s\n",
-				priv->xxfi_fname, strerror(errno));
+				priv->pantryc_fname, strerror(errno));
 		rstat = SMFIS_TEMPFAIL;
-		(void) unlink(priv->xxfi_fname);
+		(void) unlink(priv->pantryc_fname);
 	} else if (ok) {
 		/* add a header to the message announcing our presence */
 		if (gethostname(host, sizeof host) < 0)
 			snprintf(host, sizeof host, "localhost");
-		p = strrchr(priv->xxfi_fname, '/');
+		p = strrchr(priv->pantryc_fname, '/');
 		if (p == NULL)
-			p = priv->xxfi_fname;
+			p = priv->pantryc_fname;
 		else
 			p++;
 		snprintf(hbuf, sizeof hbuf, "%s@%s", p, host);
@@ -241,67 +240,67 @@ sfsistat xxfi_cleanup(ctx, ok)
 			fprintf(stderr, "Couldn't add header: X-Archived: %s\n", hbuf);
 			ok = FALSE;
 			rstat = SMFIS_TEMPFAIL;
-			(void) unlink(priv->xxfi_fname);
+			(void) unlink(priv->pantryc_fname);
 		}
 	} else {
 		/* message was aborted -- delete the archive file */
-		fprintf(stderr, "Message aborted.  Removing %s\n", priv->xxfi_fname);
+		fprintf(stderr, "Message aborted.  Removing %s\n", priv->pantryc_fname);
 		rstat = SMFIS_TEMPFAIL;
-		(void) unlink(priv->xxfi_fname);
+		(void) unlink(priv->pantryc_fname);
 	}
 	/* release private memory */
-	if (priv->xxfi_fname != NULL)
-		free(priv->xxfi_fname);
+	if (priv->pantryc_fname != NULL)
+		free(priv->pantryc_fname);
 	/* return status */
 	return rstat;
 }
 
-sfsistat xxfi_close(ctx)
+sfsistat pantryc_close(ctx)
 	SMFICTX *ctx; {
 	struct mlfiPriv *priv = MLFIPRIV;
 	if (priv == NULL)
 		return SMFIS_CONTINUE;
-	if (priv->xxfi_connectfrom != NULL)
-		free(priv->xxfi_connectfrom);
-	if (priv->xxfi_helofrom != NULL)
-		free(priv->xxfi_helofrom);
+	if (priv->pantryc_connectfrom != NULL)
+		free(priv->pantryc_connectfrom);
+	if (priv->pantryc_helofrom != NULL)
+		free(priv->pantryc_helofrom);
 	free(priv);
 	smfi_setpriv(ctx, NULL);
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_unknown(ctx, cmd)
+sfsistat pantryc_unknown(ctx, cmd)
 	SMFICTX *ctx;char *cmd; {
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_data(ctx)
+sfsistat pantryc_data(ctx)
 	SMFICTX *ctx; {
 	return SMFIS_CONTINUE;
 }
 
-sfsistat xxfi_negotiate(ctx, f0, f1, f2, f3, pf0, pf1, pf2, pf3)
+sfsistat pantryc_negotiate(ctx, f0, f1, f2, f3, pf0, pf1, pf2, pf3)
 	SMFICTX *ctx;unsigned long f0;unsigned long f1;unsigned long f2;unsigned long f3;unsigned long *pf0;unsigned long *pf1;unsigned long *pf2;unsigned long *pf3; {
 	return SMFIS_ALL_OPTS;
 }
 
-struct smfiDesc smfilter = { "SampleFilter", /* filter name */
+struct smfiDesc smfilter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
 SMFIF_ADDHDRS | SMFIF_ADDRCPT,
 /* flags */
-xxfi_connect, /* connection info filter */
-xxfi_helo, /* SMTP HELO command filter */
-xxfi_envfrom, /* envelope sender filter */
-xxfi_envrcpt, /* envelope recipient filter */
-xxfi_header, /* header filter */
-xxfi_eoh, /* end of header */
-xxfi_body, /* body block filter */
-xxfi_eom, /* end of message */
-xxfi_abort, /* message aborted */
-xxfi_close, /* connection cleanup */
-xxfi_unknown, /* unknown SMTP commands */
-xxfi_data, /* DATA command */
-xxfi_negotiate /* Once, at the start of each SMTP connection */
+pantryc_connect, /* connection info filter */
+pantryc_helo, /* SMTP HELO command filter */
+pantryc_envfrom, /* envelope sender filter */
+pantryc_envrcpt, /* envelope recipient filter */
+pantryc_header, /* header filter */
+pantryc_eoh, /* end of header */
+pantryc_body, /* body block filter */
+pantryc_eom, /* end of message */
+pantryc_abort, /* message aborted */
+pantryc_close, /* connection cleanup */
+pantryc_unknown, /* unknown SMTP commands */
+pantryc_data, /* DATA command */
+pantryc_negotiate /* Once, at the start of each SMTP connection */
 };
 
 static void usage(prog)

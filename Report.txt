@@ -1,0 +1,27 @@
+Link github: https://github.com/hocvien6/MailPantryc
+
+========== WEEK 1 - 2 ==========
+- Install and integrate SpamAssassin with Postfix
+- Send email via telnet command line
+- Configure SpamAssassin: use black list rule, read mail content... to recognize mail is either spam or not
+- List mail queue and read mail.log
+- Write custom plugin using SpamAssassin to filter mail 
+
+========== WEEK 3 ==========
+Tue 07/15/2014:
+- Add CDT plugin to Eclipse (C/C++ IDE)
+- Create MailPantryc Project
+- Compile and very-first Run
+
+Wed 07/16/2014 - Fri 07/18/2014:
+- Install, read libmilter API documentation
+... Stalk ...
+
+========== WEEK 4 ==========
+Mon 07/21/2014:
+- Plug MailPantryc into Postfix successfully
+- Learn how to: 
+	+ Send an email with attachments by sendEmail command line
+	+ Read the body of message, including information about attachments
+- MIME standard
+- Create account at Vbox
