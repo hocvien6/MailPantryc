@@ -78,6 +78,8 @@ Hence, you can use absolute path to specify certain socket
 example: smtpd_milters = unix:/home/<user name>/<path>/f1.sock
 (remember still must change socket file mode to 777)
 Then restart postfix
+Run program:
+$ ./MailPantryc -p Running/f1.sock
 
 Test by using telnet:
 $ telnet localhost 25
@@ -105,3 +107,6 @@ Install sendEmail:
 Reference:
 http://backreference.org/2013/05/22/send-email-with-attachments-from-script-or-command-line/
 http://en.wikipedia.org/wiki/MIME
+
+Ex:
+sendEmail -f <sender>@gmail.com -t <recipient>@gmail.com -m "data" -xu sender -xp <password> -s smtp.gmail.com:587
