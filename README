@@ -27,9 +27,9 @@ $ ./MailPantryc [option...]
 Reference:
 http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-threads/comment-page-1/
 
-==============
+=============================
 PLUG MAILPANTRYC INTO POSTFIX
-1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter applications):
+1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter application):
 smtpd_milters = unix:<path to socket>							# socket to plug MailPantryc into
 
 Note:
