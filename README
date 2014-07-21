@@ -30,7 +30,7 @@ http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-th
 ==============
 PLUG MAILPANTRYC INTO POSTFIX
 1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter applications):
-smtpd_milters = unix:<path to socket>
+smtpd_milters = unix:<path to socket>							# socket to plug MailPantryc into
 
 Note:
 The general syntax for listening sockets is as follows:
@@ -56,17 +56,28 @@ b. Restart postfix
 3. Example:
 Append to /etc/postfix/main.cf
 smtpd_milters = unix:/MailPantryc/f1.sock							# relative path
-
 Run:
-# mkdir /var/spool/postfix/MailPantryc								# create new directory to put socket
+# mkdir /var/spool/postfix/MailPantryc								# create new directory to store sockets
 or
 # rm /var/spool/postfix/MailPantryc/f1.sock							# remove old socket
 then:
 # ./MailPantryc -p /var/spool/postfix/MailPantryc/f1.sock			# run program with new socket
-																	# /var/spool/postfix/ - Postfix queue directory
+	(/var/spool/postfix/ - Postfix queue directory)
 Open new Terminal tab and run:
 # chmod 777 /var/spool/postfix/MailPantryc/f1.sock
 # service postfix restart
+
+Or another way (more simple):
+Modify /etc/postfix/master.cf file:
+change line:
+smtp	   inet  n       -       -       -       -       smtpd
+to:
+smtp	   inet  n       -       n       -       -       smtpd
+(disable chrooted permission)
+Hence, you can use absolute path to specify certain socket
+example: smtpd_milters = unix:/home/<user name>/<path>/f1.sock
+(remember still must change socket file mode to 777)
+Then restart postfix
 
 Test by using telnet:
 $ telnet localhost 25
@@ -81,5 +92,5 @@ An apple a day, keep doctor away
 .
 quit
 
-In addition: this program while running will create temporary file at /tmp, to remove them, run:
+In addition: this program while running will create temporary file at /tmp/, to remove them, run:
 # rm /tmp/msg.*

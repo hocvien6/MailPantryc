@@ -48,7 +48,6 @@ sfsistat xxfi_connect(ctx, hostname, hostaddr)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	printf("%s\n",hostname); // DEBUG
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -83,6 +82,13 @@ sfsistat xxfi_envfrom(ctx, argv)
 	int argc = 0;
 	struct mlfiPriv *priv = MLFIPRIV;
 	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
+
+	// DEBUG
+	FILE *f = fopen("Running/info.txt","w");
+	fprintf(f,"%s\n",mailaddr);
+	fclose(f);
+	//
+
 #ifdef WIN32
 	char szFilename[MAX_PATH]= {0};
 #endif /* WIN32 */
@@ -130,7 +136,6 @@ sfsistat xxfi_envfrom(ctx, argv)
 		(void) xxfi_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	printf("%s\n",mailaddr);
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
