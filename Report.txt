@@ -25,3 +25,8 @@ Mon 07/21/2014:
 	+ Read the body of message, including information about attachments
 - MIME standard
 - Create account at Vbox
+
+Tue 07/22/2014:
+- Use zlib library to read and decompress gzip file
+- Base64: how to encode and decode
+- MIME::Decoder (CPAN - Perl module): create new project for testing
