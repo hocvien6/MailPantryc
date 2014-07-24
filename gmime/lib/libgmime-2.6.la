@@ -17,7 +17,7 @@ old_library='libgmime-2.6.a'
 inherited_linker_flags=' -pthread'
 
 # Libraries that this one depends upon.
-dependency_libs=' -lgmodule-2.0 -lgthread-2.0 -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lz -lnsl'
+dependency_libs=' -lgmodule-2.0 -lgthread-2.0 -lrt -lgio-2.0 -lgobject-2.0 -lglib-2.0 -lz -lnsl'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/forlax/Workspace/Collected/gmime/lib'
+libdir='/home/hocvien6/Workspace/Setup/Gmime/gmime/lib'

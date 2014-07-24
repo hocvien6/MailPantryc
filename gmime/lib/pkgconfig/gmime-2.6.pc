@@ -1,4 +1,4 @@
-prefix=/home/forlax/Workspace/Collected/gmime
+prefix=/home/hocvien6/Workspace/Setup/Gmime/gmime
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
