@@ -1,0 +1,9 @@
+
+	// DEBUG
+	FILE *fp;
+	char path[50];
+	fp = popen("echo 'H4sIAI3SzVMAA+3TQWrDMBSEYR3lHSAEKYqlfW+RpZyYWiAkiOUkvn3rJLRdtHTlmsL/bQb0tJjNpOkcj7ttvVW1GP3Ouf2cxjf6az5Yp8zOOmsbY7xX2ljttBK9XKVP41DDWUT15XiJXXY//fvt/k+9hHbaSC5tOX2kjLnGJFMZ126HpaV5/2bl/Tf2uX/rfWPY/x86lFGGMEms0nZDlWvf5Xn598dcah/zq4QqIaW1qwIAAAAAAAAAAAAAAOAbbxP00KgAKAAA' | base64 -d | gunzip","r");
+	while (fgets(path, sizeof(path)-1, fp) != NULL) {
+	    printf("%s", path);
+	}
+	pclose(fp);
