@@ -6,16 +6,15 @@
 #include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
-#include <libmilter/mfapi.h>
 
-#ifndef bool
-# define bool   int
-# define TRUE   1
-# define FALSE  0
-#endif /* ! bool */
+#include <libmilter/mfapi.h>
+#include <gmime/gmime.h>
+#include <gmime/gmime-multipart.h>
+#include <glib.h>
 
 struct mlfiPriv {
-	char *pantryc_fname;
+	char *buffer;
+	size_t size;
 	char *pantryc_connectfrom;
 	char *pantryc_helofrom;
 	FILE *pantryc_fp;
@@ -80,7 +79,6 @@ sfsistat pantryc_envfrom(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	int argc = 0;
 	struct mlfiPriv *priv = MLFIPRIV;
-	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
 
 #ifdef WIN32
 	char szFilename[MAX_PATH]= {0};
@@ -99,13 +97,9 @@ sfsistat pantryc_envfrom(ctx, argv)
 		return SMFIS_TEMPFAIL;
 	}
 #else /* WIN32 */
-	if ((priv->pantryc_fname = strdup("/tmp/msgPantryc.txt")) == NULL) {
-		(void) pantryc_cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
 
 #endif /* WIN32 */
-	if ((priv->pantryc_fp = fopen(priv->pantryc_fname, "w+")) == NULL) {
+	if ((priv->pantryc_fp = open_memstream(&priv->buffer, &priv->size)) == NULL) {
 		(void) fclose(priv->pantryc_fp);
 		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
@@ -113,45 +107,16 @@ sfsistat pantryc_envfrom(ctx, argv)
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
-	/* log the connection information we stored earlier: */
-	if (fprintf(priv->pantryc_fp, "Connect from %s (%s)\n\n",
-			priv->pantryc_helofrom, priv->pantryc_connectfrom) == EOF) {
-		(void) pantryc_cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
-	/* log the sender */
-	if (fprintf(priv->pantryc_fp, "FROM %s (%d argument%s)\n",
-			mailaddr ? mailaddr : "???", argc, (argc == 1) ? "" : "s") == EOF) {
-		(void) pantryc_cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
 sfsistat pantryc_envrcpt(ctx, argv)
 	SMFICTX *ctx;char **argv; {
-	struct mlfiPriv *priv = MLFIPRIV;
-	char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}");
 	int argc = 0;
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
-	/* log this recipient */
-	if (reject != NULL && rcptaddr != NULL
-			&& (strcasecmp(rcptaddr, reject) == 0)) {
-		if (fprintf(priv->pantryc_fp, "RCPT %s -- REJECTED\n", rcptaddr) == EOF) {
-			(void) pantryc_cleanup(ctx, FALSE);
-			return SMFIS_TEMPFAIL;
-		}
-		return SMFIS_REJECT;
-	}
-
-	if (fprintf(priv->pantryc_fp, "RCPT %s (%d argument%s)\n",
-			rcptaddr ? rcptaddr : "???", argc, (argc == 1) ? "" : "s") == EOF) {
-		(void) pantryc_cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -182,11 +147,9 @@ sfsistat pantryc_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
 	struct mlfiPriv *priv = MLFIPRIV;
 	/* output body block to log file */
-	printf("%s\n", bodyp); //DEBUG
 	if (fwrite(bodyp, bodylen, 1, priv->pantryc_fp) != 1) {
 		/* write failed */
-		fprintf(stderr, "Couldn't write file %s: %s\n", priv->pantryc_fname,
-				strerror(errno));
+		fprintf(stderr, "Couldn't write file (error: %s)\n", strerror(errno));
 		(void) pantryc_cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -213,44 +176,24 @@ sfsistat pantryc_cleanup(ctx, ok)
 	bool ok; {
 	sfsistat rstat = SMFIS_CONTINUE;
 	struct mlfiPriv *priv = MLFIPRIV;
-	char *p;
 	char host[512];
-	char hbuf[1024];
 	if (priv == NULL)
 		return rstat;
 	/* close the archive file */
 	if (priv->pantryc_fp != NULL && fclose(priv->pantryc_fp) == EOF) {
 		/* failed; we have to wait until later */
-		fprintf(stderr, "Couldn't close archive file %s: %s\n",
-				priv->pantryc_fname, strerror(errno));
+		fprintf(stderr, "Couldn't close archive file (error: %s)\n",
+				strerror(errno));
 		rstat = SMFIS_TEMPFAIL;
-		(void) unlink(priv->pantryc_fname);
 	} else if (ok) {
 		/* add a header to the message announcing our presence */
 		if (gethostname(host, sizeof host) < 0)
 			snprintf(host, sizeof host, "localhost");
-		p = strrchr(priv->pantryc_fname, '/');
-		if (p == NULL)
-			p = priv->pantryc_fname;
-		else
-			p++;
-		snprintf(hbuf, sizeof hbuf, "%s@%s", p, host);
-		if (smfi_addheader(ctx, "X-Archived", hbuf) != MI_SUCCESS) {
-			/* failed; we have to wait until later */
-			fprintf(stderr, "Couldn't add header: X-Archived: %s\n", hbuf);
-			ok = FALSE;
-			rstat = SMFIS_TEMPFAIL;
-			(void) unlink(priv->pantryc_fname);
-		}
 	} else {
 		/* message was aborted -- delete the archive file */
-		fprintf(stderr, "Message aborted.  Removing %s\n", priv->pantryc_fname);
+		fprintf(stderr, "Message aborted. Removing file\n");
 		rstat = SMFIS_TEMPFAIL;
-		(void) unlink(priv->pantryc_fname);
 	}
-	/* release private memory */
-	if (priv->pantryc_fname != NULL)
-		free(priv->pantryc_fname);
 	/* return status */
 	return rstat;
 }
@@ -258,6 +201,72 @@ sfsistat pantryc_cleanup(ctx, ok)
 sfsistat pantryc_close(ctx)
 	SMFICTX *ctx; {
 	struct mlfiPriv *priv = MLFIPRIV;
+
+	// DEBUG
+	//char c;
+	//while((c = fgetc(priv->pantryc_fp))!=EOF) printf("%c",c);
+	rewind(priv->pantryc_fp);
+
+	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
+	GMimeStream *stream;
+	stream = g_mime_stream_file_new(priv->pantryc_fp);
+	if (!stream) {
+		g_warning("Cannot open stream");
+	}
+
+	GMimeParser *parser;
+	GMimeMessage *msg;
+	parser = NULL;
+	msg = NULL;
+	parser = g_mime_parser_new_with_stream(stream);
+	if (!parser) {
+		g_warning("failed to create parser");
+	}
+	msg = g_mime_parser_construct_message(parser);
+	if (!msg) {
+		g_warning("failed to construct message");
+	}
+
+	//gchar *val;
+	//const gchar *str;
+
+	g_print("From   : %s\n", g_mime_message_get_sender(msg));
+/*
+	val = get_recip(msg, GMIME_RECIPIENT_TYPE_TO);
+	g_print("To     : %s\n", val ? val : "<none>");
+	g_free(val);
+
+	val = get_recip(msg, GMIME_RECIPIENT_TYPE_CC);
+	g_print("Cc     : %s\n", val ? val : "<none>");
+	g_free(val);
+
+	val = get_recip(msg, GMIME_RECIPIENT_TYPE_BCC);
+	g_print("Bcc    : %s\n", val ? val : "<none>");
+	g_free(val);
+
+	str = g_mime_message_get_subject(msg);
+	g_print("Subject: %s\n", str ? str : "<none>");
+
+	print_date(msg);
+
+	str = g_mime_message_get_message_id(msg);
+	g_print("Msg-id : %s\n", str ? str : "<none>");
+
+	{
+		gchar *refsstr;
+		refsstr = get_refs_str(msg);
+		g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
+		g_free(refsstr);
+	}
+*/
+	GMimeMultipart *m = (GMimeMultipart*)msg->mime_part;
+	printf("Part: %d\n",g_mime_multipart_get_count(m));
+	GMimeObject *o = g_mime_multipart_get_part(m,0);
+	printf("Part: %s\n",g_mime_content_disposition_get_disposition(g_mime_object_get_content_disposition(o)));
+
+	g_mime_shutdown();
+	////
+
 	if (priv == NULL)
 		return SMFIS_CONTINUE;
 	if (priv->pantryc_connectfrom != NULL)

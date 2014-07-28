@@ -31,5 +31,13 @@ Tue 07/22/2014:
 - Base64: how to encode and decode
 - MIME::Decoder (CPAN - Perl module): create new project for testing
 
-http://www.lemoda.net/c/zlib-open-read/
-https://github.com/kripken/emscripten/issues/124
+Wed 07/23/2014 - Fri 07/25/2014:
+- Optimize performance: learn to write and read with pipe(7) and popen(3) function
+- Decode base64-encoded compressed file using zlib
+... Stalk ...
+
+========== WEEK 5 ==========
+Mon 07/28/2014:
+- Convert base64 to file
+- Create gmime stream without opening an existing file
+- Learn how to use gmime library
