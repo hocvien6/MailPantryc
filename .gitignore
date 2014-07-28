@@ -23,3 +23,6 @@
 *.hex
 /Debug/
 /Release/
+
+# Socket
+*.sock
