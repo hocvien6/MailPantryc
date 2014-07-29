@@ -46,4 +46,10 @@ Tue 07/29/2014:
 - Fix bug: Closing archive file at xxfi_cleanup and create a new gmime stream from it causes a memory error
 	--> Close archive file at xxfi_close
 - Change project type to static library
-- Create new executable project for testing 
+- Create new executable project for testing
+- Create pantryc-scanner, pantryc-base64
+- Write:
+	+ pantryc_scanner_get_recip, pantryc_scanner_print_date, pantryc_scanner_get_refs_str function
+		(pantryc-scanner)
+	+ pantryc_base64_decode_gzip function
+		(pantryc-base64)

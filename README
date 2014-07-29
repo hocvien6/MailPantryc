@@ -1,43 +1,50 @@
-MailPantryc
+Pantryc
 ===========
 +--------------+
 | INTRODUCTION |
 +--------------+
-									
 
-									
+
+
 +--------------+
 | DEPENDENCIES |
 +--------------+
-									
 - libmilter
 - glib-2.0
-- gmime-2.6									
-									
-+---------------+
-| DOCUMENTATION |
-+---------------+
-									
-									
-									
+- gmime-2.6
+
+
 +---------------------+
 | DIRECTORY STRUCTURE |
 +---------------------+
-									
-									
-									
-+------------+
-| INSTALLING |
-+------------+
-1.
+
+
+			
++---------+
+| INSTALL |
++---------+
+
+
+
++-----------+
+| COMPILING |
++-----------+
+1. How to use
 #include <pantryc.h>
 
-2.
--lpantryc -lmilter -lglib-2.0 -lgmime-2.6
--L<path to libpantryc.a> -L/usr/lib/libmilter
+2. Correct order:
 -I<path to pantryc.h>
-									
-									
+-I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/include/gmime-2.6
+-L<path to libpantryc.a> -L/usr/lib/libmilter
+-lpantryc -lmilter -lglib-2.0 -lgmime-2.6
+
+
 +---------------+
 | CONFIGURATION |
++---------------+						
+
+
+
++---------------+
+| DOCUMENTATION |
 +---------------+

@@ -1,72 +1,10 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
-#include <unistd.h>
-#include <glib.h>
 #include <libmilter/mfapi.h>
 #include <gmime/gmime.h>
 
 #include "../include/pantryc.h"
-
-// DEBUG
-gchar*
-get_recip(GMimeMessage *msg, GMimeRecipientType rtype) {
-	char *recep;
-	InternetAddressList *receps;
-
-	receps = g_mime_message_get_recipients(msg, rtype);
-	recep = (char*) internet_address_list_to_string(receps, FALSE);
-
-	if (!recep || !*recep) {
-		g_free(recep);
-		return NULL;
-	}
-
-	return recep;
-}
-void print_date(GMimeMessage *msg) {
-	time_t t;
-	int tz;
-	char buf[64];
-	size_t len;
-	struct tm *t_m;
-
-	g_mime_message_get_date(msg, &t, &tz);
-	t_m = localtime(&t);
-
-	len = strftime(buf, sizeof(buf) - 1, "%c", t_m);
-
-	if (len > 0)
-		g_print("Date   : %s (%s%04d)\n", buf, tz < 0 ? "-" : "+", tz);
-}
-gchar*
-get_refs_str(GMimeMessage *msg) {
-	const gchar *str;
-	const GMimeReferences *cur;
-	GMimeReferences *mime_refs;
-	gchar *rv;
-
-	str = g_mime_object_get_header(GMIME_OBJECT(msg), "References");
-	if (!str)
-		return NULL;
-
-	mime_refs = g_mime_references_decode(str);
-	for (rv = NULL, cur = mime_refs; cur;
-			cur = g_mime_references_get_next(cur)) {
-
-		const char* msgid;
-		msgid = g_mime_references_get_message_id(cur);
-		rv = g_strdup_printf("%s%s%s", rv ? rv : "", rv ? "," : "", msgid);
-	}
-	g_mime_references_free(mime_refs);
-
-	return rv;
-}
-////
 
 typedef struct mlfiPriv {
 	char *buffer;
@@ -234,7 +172,7 @@ sfsistat pantryc_cleanup(ctx, ok)
 	char host[512];
 	if (priv == NULL)
 		return rstat;
-	// DEBUG
+	// TESTING
 	// close the archive file
 	if (ok) {
 		// add a header to the message announcing our presence
@@ -255,7 +193,7 @@ sfsistat pantryc_close(ctx)
 	SMFICTX *ctx; {
 	mlfiPriv *priv = MLFIPRIV;
 
-	// DEBUG
+	// TESTING
 	rewind(priv->pantryc_fp);
 
 	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
@@ -283,29 +221,29 @@ sfsistat pantryc_close(ctx)
 	const gchar *str;
 	g_print("From   : %s\n", g_mime_message_get_sender(msg));
 
-	val = get_recip(msg, GMIME_RECIPIENT_TYPE_TO);
+	val = pantryc_scanner_get_recip(msg, GMIME_RECIPIENT_TYPE_TO);
 	g_print("To     : %s\n", val ? val : "<none>");
 	g_free(val);
 
-	val = get_recip(msg, GMIME_RECIPIENT_TYPE_CC);
+	val = pantryc_scanner_get_recip(msg, GMIME_RECIPIENT_TYPE_CC);
 	g_print("Cc     : %s\n", val ? val : "<none>");
 	g_free(val);
 
-	val = get_recip(msg, GMIME_RECIPIENT_TYPE_BCC);
+	val = pantryc_scanner_get_recip(msg, GMIME_RECIPIENT_TYPE_BCC);
 	g_print("Bcc    : %s\n", val ? val : "<none>");
 	g_free(val);
 
 	str = g_mime_message_get_subject(msg);
 	g_print("Subject: %s\n", str ? str : "<none>");
 
-	print_date(msg);
+	pantryc_scanner_print_date(msg);
 
 	str = g_mime_message_get_message_id(msg);
 	g_print("Msg-id : %s\n", str ? str : "<none>");
 
 	{
 		gchar *refsstr;
-		refsstr = get_refs_str(msg);
+		refsstr = pantryc_scanner_get_refs_str(msg);
 		g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
 		g_free(refsstr);
 	}
@@ -330,7 +268,7 @@ sfsistat pantryc_close(ctx)
 	free(priv);
 	smfi_setpriv(ctx, NULL);
 
-	// DEBUG
+	// TESTING
 	/* close the archive file */
 	if (priv->pantryc_fp != NULL && fclose(priv->pantryc_fp) == EOF) {
 		/* failed; we have to wait until later */
@@ -383,7 +321,7 @@ static void usage(prog)
 			prog);
 }
 
-int run(argc, argv)
+int pantryc_run(argc, argv)
 	int argc;char **argv; {
 	bool setconn = FALSE;
 	int c;

@@ -9,23 +9,26 @@ http://download.eclipse.org/tools/cdt/releases/8.4
 a. Installing libmilter
 # apt-get install libmilter1.0.1 libmilter1.0.1-dbg libmilter-dev 
 b. 
-- Add library "milter"
-- Add Library search path "/usr/lib/libmilter"
+- Add library "milter"									# NO LONGER NEEDED
+- Add Library search path "/usr/lib/libmilter"			# NO LONGER NEEDED
 
 3. Linking with a pthread support library
 Reference:
 http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-threads/comment-page-1/
 
 4. Include glib library:
-- Add libraries: "glib-2.0"
+- Add libraries: "glib-2.0"								# NO LONGER NEEDED
 - Add Include path: "/usr/include/glib-2.0" "/usr/lib/i386-linux-gnu/glib-2.0/include"
 
 5. Use gmime library to parse an email with MIME standard format
 a. Installing gmime
 # apt-get install libgmime-2.6-dev
 b.
-- Add library "gmime-2.6"
+- Add library "gmime-2.6"								# NO LONGER NEEDED
 - Add Include path: "/usr/include/gmime-2.6"
+
+6. Add own Include path to project
+"${workspace_loc:/${ProjName}/include}"
 
 ========================
 ECLIPSE PROJECT SETTINGS
@@ -55,7 +58,28 @@ NOTE:
 - C/C++ project with type "library" should have no `main' function
 - A static library project don't need to add library (-l) and Library search path (-L)
 All you need is Include path (-I)
-- Executable project that uses other(s) library project(s) must specify full path -l and -L  
+
+5. Build executable project
+- Executable project that uses other(s) library project(s) must specify full path -l and -L
+$ gcc -o run run.c \
+	-I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/include/gmime-2.6 \
+	-I<path to pantryc include> \
+	-L/usr/lib/libmilter \
+	-L<path to pantryc lib file: libpantryc.a> \
+	-lpantryc -lgmime-2.6 -lmilter -lglib-2.0 					# correct order
+Ex:
+$ gcc -o run run.c \
+ 	-I/usr/include/glib-2.0 \
+ 	-I/usr/lib/i386-linux-gnu/glib-2.0/include \
+ 	-I/usr/include/gmime-2.6 \
+ 	-I/home/hocvien6/Workspace/pantryc/include \
+ 	-L/usr/lib/libmilter \
+ 	-L/home/hocvien6/Workspace/pantryc/Debug \
+ 	-lpantryc -lgmime-2.6 -lmilter -lglib-2.0
+
+- Change the order in which libraries are linked may cause errors
+Reference:
+http://stackoverflow.com/questions/45135/linker-order-gcc
 
 =============================
 PLUG PANTRYC INTO POSTFIX
