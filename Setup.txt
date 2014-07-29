@@ -46,6 +46,14 @@ Ctrl + F11 from Eclipse (optional: Run/Run Configurations...)
 or
 $ ./<program name> [option...]
 
+4. Build static library
+Go to project properties --> C/C++ Build --> Settings --> Build Artifact tab
+Change the artifact type to static or shared library
+Reference:
+http://stackoverflow.com/questions/7445429/changing-project-type-from-executable-to-static-library-in-eclipse-cdt
+http://www.youtube.com/watch?v=MnlknEMjjGw
+NOTE: C/C++ project with type "library" should have no `main' function
+
 =============================
 PLUG MAILPANTRYC INTO POSTFIX
 1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter application):

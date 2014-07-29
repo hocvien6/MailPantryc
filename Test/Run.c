@@ -12,12 +12,6 @@
 #include <gmime/gmime.h>
 
 // DEBUG
-/*
- #include <gmime/gmime-multipart.h>
- #include <gmime/gmime-parser.h>
- #include <gmime/gmime-stream-file.h>
- #include <gmime/gmime-utils.h>
- */
 gchar*
 get_recip(GMimeMessage *msg, GMimeRecipientType rtype) {
 	char *recep;
@@ -388,7 +382,7 @@ static void usage(prog)
 			prog);
 }
 
-int main(argc, argv)
+int run(argc, argv)
 	int argc;char **argv; {
 	bool setconn = FALSE;
 	int c;

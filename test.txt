@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <ctype.h>
+#include <glib.h>
+
+int main() {
+
+	gsize length;
+	char * org = (char*) malloc(20000 * sizeof(char));
+	strcpy(org, "QmFieSBsaWZlIHdhcyBnb29kIHRvIG1lCkJ1dCB5b3UganVzdCBtYWRlIGl0IGJldHRlcgpJIGxv\
+dmUgdGhlIHdheSB5b3Ugc3RhbmQgYnkgbWUKVGhyb3VnaHQgYW55IGtpbmQgb2Ygd2VhdGhlcgpJ\
+IGRvbid0IHdhbm5hIHJ1biBhd2F5Ckp1c3Qgd2FubmEgbWFrZSB5b3VyIGRheQpXaGVuIHlvdSBm\
+ZWVsIHRoZSB3b3JsZCBpcyBvbiB5b3VyIHNob3VsZGVycwpEb24ndCB3YW5uYSBtYWtlIGl0IHdv\
+cnNlCkp1c3Qgd2FubmEgbWFrZSB1cyB3b3JrCkJhYnkgdGVsbCBtZSBJIHdpbGwgZG8gd2hhdGV2\
+ZXIKCltDaG9ydXM6XQpJdCBmZWVscyBsaWtlIG5vYm9keSBldmVyIGtuZXcgbWUgdW50aWwgeW91\
+IGtuZXcgbWUKRmVlbHMgbGlrZSBub2JvZHkgZXZlciBsb3ZlZCBtZSB1bnRpbCB5b3UgbG92ZWQg\
+bWUKRmVlbHMgbGlrZSBub2JvZHkgZXZlciB0b3VjaGVkIG1lIHVudGlsIHlvdSB0b3VjaGVkIG1l\
+CkJhYnkgbm9ib2R5LCBub2JvZHksIHVudGlsIHlvdQoKQmFieSBpdCBqdXN0IHRvb2sgb25lIGhp\
+dCBvZiB5b3Ugbm93IEknbSBhZGRpY3RlZApZb3UgbmV2ZXIga25vdyB3aGF0J3MgbWlzc2luZwpU\
+aWxsIHlvdSBnZXQgZXZlcnl0aGluZyB5b3UgbmVlZCwgeWVhaApJIGRvbid0IHdhbm5hIHJ1biBh\
+d2F5Ckp1c3Qgd2FubmEgbWFrZSB5b3VyIGRheQpXaGVuIHlvdSBmZWVsIHRoZSB3b3JsZCBpcyBv\
+biB5b3VyIHNob3VsZGVycwpEb24ndCB3YW5uYSBtYWtlIGl0IHdvcnNlCkp1c3Qgd2FubmEgbWFr\
+ZSB1cyB3b3JrCkJhYnkgdGVsbCBtZSwgSSdsbCBkbyB3aGF0ZXZlcgoKW0Nob3J1czpdCkl0IGZl\
+ZWxzIGxpa2Ugbm9ib2R5IGV2ZXIga25ldyBtZSB1bnRpbCB5b3Uga25ldyBtZQpGZWVscyBsaWtl\
+IG5vYm9keSBldmVyIGxvdmVkIG1lIHVudGlsIHlvdSBsb3ZlZCBtZQpGZWVscyBsaWtlIG5vYm9k\
+eSBldmVyIHRvdWNoZWQgbWUgdW50aWwgeW91IHRvdWNoZWQgbWUKQmFieSwgbm9ib2R5LCBub2Jv\
+ZHkgdW50aWwgeW91CgpTZWUgaXQgd2FzIGVub3VnaCB0byBrbm93CklmIEkgZXZlciBsZXQgeW91\
+IGdvCkkgd291bGQgYmUgbm8gb25lCkNhdXNlIEkgbmV2ZXIgdGhvdWdodCBJJ2QgZmVlbApBbGwg\
+dGhlIHRoaW5ncyB5b3UgbWFkZSBtZSBmZWVsCldhc24ndCBsb29raW5nIGZvciBzb21lb25lIHVu\
+dGlsIHlvdQoKW0Nob3J1cyB4Ml0KCk5vYm9keSwgbm9ib2R5LCB1bnRpbCB5b3Ug");
+	guchar * res = g_base64_decode(org, &length);
+	printf("%ld\n", length);
+
+	guchar data[length];
+	memcpy(data, res, length);
+
+	int i;
+	for (i = 0; i <= length - 1; i++) {
+		printf("%02x", data[i]);
+		if (i % 2 == 1)
+			printf(" ");
+		if (i % 16 == 15)
+			printf("\n");
+	}
+	printf("\n");
+
+	FILE *f = fopen("u.txt", "wb");
+	fwrite(data, sizeof(guchar), length, f);
+
+	return 0;
+}
