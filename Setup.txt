@@ -1,4 +1,4 @@
-MailPantryc
+pantryc
 ==============
 DO THESE FIRST
 
@@ -17,15 +17,14 @@ Reference:
 http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-threads/comment-page-1/
 
 4. Include glib library:
-Add Include path:
-"/usr/include/glib-2.0" "/usr/lib/i386-linux-gnu/glib-2.0/include"
-Add libraries:
--lglib-2.0
+- Add libraries: "glib-2.0"
+- Add Include path: "/usr/include/glib-2.0" "/usr/lib/i386-linux-gnu/glib-2.0/include"
 
 5. Use gmime library to parse an email with MIME standard format
 a. Installing gmime
 # apt-get install libgmime-2.6-dev
 b.
+- Add library "gmime-2.6"
 - Add Include path: "/usr/include/gmime-2.6"
 
 ========================
@@ -52,12 +51,16 @@ Change the artifact type to static or shared library
 Reference:
 http://stackoverflow.com/questions/7445429/changing-project-type-from-executable-to-static-library-in-eclipse-cdt
 http://www.youtube.com/watch?v=MnlknEMjjGw
-NOTE: C/C++ project with type "library" should have no `main' function
+NOTE:
+- C/C++ project with type "library" should have no `main' function
+- A static library project don't need to add library (-l) and Library search path (-L)
+All you need is Include path (-I)
+- Executable project that uses other(s) library project(s) must specify full path -l and -L  
 
 =============================
-PLUG MAILPANTRYC INTO POSTFIX
-1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter application):
-smtpd_milters = unix:<path to socket>							# socket to plug MailPantryc into
+PLUG PANTRYC INTO POSTFIX
+1. Configure Postfix: add this line in /etc/postfix/main.cf (specify pantryc as SMTP-only Milter application):
+smtpd_milters = unix:<path to socket>							# socket to plug pantryc into
 
 Note:
 The general syntax for listening sockets is as follows:
@@ -72,26 +75,26 @@ Reference:
 http://www.postfix.org/MILTER_README.html
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=496003
 
-2. Plug MailPantryc into Postfix
+2. Plug pantryc into Postfix
 1. Create socket
 $ rm <path to socket>												# remove if socket is existing
-$ ./MailPantryc -p <path to socket>									# run MailPantryc with new socket
+$ ./pantryc -p <path to socket>										# run pantryc with new socket
 $ chmod 777 <path to socket>										# grant permission on new socket
 b. Restart postfix
 # service postfix restart
 
 3. Example:
 Append to /etc/postfix/main.cf
-smtpd_milters = unix:/MailPantryc/f1.sock							# relative path
+smtpd_milters = unix:/pantryc/f1.sock								# relative path
 Run:
-# mkdir /var/spool/postfix/MailPantryc								# create new directory to store sockets
+# mkdir /var/spool/postfix/pantryc									# create new directory to store sockets
 or
-# rm /var/spool/postfix/MailPantryc/f1.sock							# remove old socket
+# rm /var/spool/postfix/pantryc/f1.sock								# remove old socket
 then:
-# ./MailPantryc -p /var/spool/postfix/MailPantryc/f1.sock			# run program with new socket
+# ./pantryc -p /var/spool/postfix/pantryc/f1.sock					# run program with new socket
 	(/var/spool/postfix/ - Postfix queue directory)
 Open new Terminal tab and run:
-# chmod 777 /var/spool/postfix/MailPantryc/f1.sock
+# chmod 777 /var/spool/postfix/pantryc/f1.sock
 # service postfix restart
 
 Or another way (more simple):
@@ -106,7 +109,7 @@ example: smtpd_milters = unix:/home/<user name>/<path>/f1.sock
 (remember still must change socket file mode to 777)
 Then restart postfix
 Run program:
-$ ./MailPantryc -p Running/f1.sock
+$ ./pantryc -p Running/f1.sock
 
 Test by using telnet:
 $ telnet localhost 25

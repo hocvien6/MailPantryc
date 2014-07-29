@@ -45,3 +45,5 @@ Mon 07/28/2014:
 Tue 07/29/2014:
 - Fix bug: Closing archive file at xxfi_cleanup and create a new gmime stream from it causes a memory error
 	--> Close archive file at xxfi_close
+- Change project type to static library
+- Create new executable project for testing 

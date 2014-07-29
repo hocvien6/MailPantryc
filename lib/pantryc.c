@@ -6,10 +6,11 @@
 #include <string.h>
 #include <sysexits.h>
 #include <unistd.h>
-
 #include <glib.h>
 #include <libmilter/mfapi.h>
 #include <gmime/gmime.h>
+
+#include "../include/pantryc.h"
 
 // DEBUG
 gchar*
