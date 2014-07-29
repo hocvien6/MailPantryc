@@ -7,20 +7,81 @@
 #include <sysexits.h>
 #include <unistd.h>
 
+#include <glib.h>
 #include <libmilter/mfapi.h>
 #include <gmime/gmime.h>
-#include <gmime/gmime-multipart.h>
-#include <glib.h>
 
-struct mlfiPriv {
+// DEBUG
+/*
+ #include <gmime/gmime-multipart.h>
+ #include <gmime/gmime-parser.h>
+ #include <gmime/gmime-stream-file.h>
+ #include <gmime/gmime-utils.h>
+ */
+gchar*
+get_recip(GMimeMessage *msg, GMimeRecipientType rtype) {
+	char *recep;
+	InternetAddressList *receps;
+
+	receps = g_mime_message_get_recipients(msg, rtype);
+	recep = (char*) internet_address_list_to_string(receps, FALSE);
+
+	if (!recep || !*recep) {
+		g_free(recep);
+		return NULL;
+	}
+
+	return recep;
+}
+void print_date(GMimeMessage *msg) {
+	time_t t;
+	int tz;
+	char buf[64];
+	size_t len;
+	struct tm *t_m;
+
+	g_mime_message_get_date(msg, &t, &tz);
+	t_m = localtime(&t);
+
+	len = strftime(buf, sizeof(buf) - 1, "%c", t_m);
+
+	if (len > 0)
+		g_print("Date   : %s (%s%04d)\n", buf, tz < 0 ? "-" : "+", tz);
+}
+gchar*
+get_refs_str(GMimeMessage *msg) {
+	const gchar *str;
+	const GMimeReferences *cur;
+	GMimeReferences *mime_refs;
+	gchar *rv;
+
+	str = g_mime_object_get_header(GMIME_OBJECT(msg), "References");
+	if (!str)
+		return NULL;
+
+	mime_refs = g_mime_references_decode(str);
+	for (rv = NULL, cur = mime_refs; cur;
+			cur = g_mime_references_get_next(cur)) {
+
+		const char* msgid;
+		msgid = g_mime_references_get_message_id(cur);
+		rv = g_strdup_printf("%s%s%s", rv ? rv : "", rv ? "," : "", msgid);
+	}
+	g_mime_references_free(mime_refs);
+
+	return rv;
+}
+////
+
+typedef struct mlfiPriv {
 	char *buffer;
 	size_t size;
 	char *pantryc_connectfrom;
 	char *pantryc_helofrom;
 	FILE *pantryc_fp;
-};
+} mlfiPriv;
 
-#define MLFIPRIV        ((struct mlfiPriv *) smfi_getpriv(ctx))
+#define MLFIPRIV        ((mlfiPriv *) smfi_getpriv(ctx))
 
 extern sfsistat pantryc_cleanup(SMFICTX *, bool);
 /* recipients to add and reject (set with -a and -r options) */
@@ -29,7 +90,7 @@ char *reject = NULL;
 
 sfsistat pantryc_connect(ctx, hostname, hostaddr)
 	SMFICTX *ctx;char *hostname;_SOCK_ADDR *hostaddr; {
-	struct mlfiPriv *priv;
+	mlfiPriv *priv;
 	char *ident;
 	/* allocate some private memory */
 	priv = malloc(sizeof *priv);
@@ -56,7 +117,7 @@ sfsistat pantryc_helo(ctx, helohost)
 	size_t len;
 	char *tls;
 	char *buf;
-	struct mlfiPriv *priv = MLFIPRIV;
+	mlfiPriv *priv = MLFIPRIV;
 	tls = smfi_getsymval(ctx, "{tls_version}");
 	if (tls == NULL)
 		tls = "No TLS";
@@ -78,7 +139,7 @@ sfsistat pantryc_helo(ctx, helohost)
 sfsistat pantryc_envfrom(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	int argc = 0;
-	struct mlfiPriv *priv = MLFIPRIV;
+	mlfiPriv *priv = MLFIPRIV;
 
 #ifdef WIN32
 	char szFilename[MAX_PATH]= {0};
@@ -145,7 +206,7 @@ sfsistat pantryc_eoh(ctx)
 
 sfsistat pantryc_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
-	struct mlfiPriv *priv = MLFIPRIV;
+	mlfiPriv *priv = MLFIPRIV;
 	/* output body block to log file */
 	if (fwrite(bodyp, bodylen, 1, priv->pantryc_fp) != 1) {
 		/* write failed */
@@ -172,44 +233,40 @@ sfsistat pantryc_abort(ctx)
 }
 
 sfsistat pantryc_cleanup(ctx, ok)
-	SMFICTX *ctx;
-	bool ok; {
+	SMFICTX *ctx;bool ok; {
 	sfsistat rstat = SMFIS_CONTINUE;
-	struct mlfiPriv *priv = MLFIPRIV;
+	mlfiPriv *priv = MLFIPRIV;
 	char host[512];
 	if (priv == NULL)
 		return rstat;
-	/* close the archive file */
-	if (priv->pantryc_fp != NULL && fclose(priv->pantryc_fp) == EOF) {
-		/* failed; we have to wait until later */
-		fprintf(stderr, "Couldn't close archive file (error: %s)\n",
-				strerror(errno));
-		rstat = SMFIS_TEMPFAIL;
-	} else if (ok) {
-		/* add a header to the message announcing our presence */
+	// DEBUG
+	// close the archive file
+	if (ok) {
+		// add a header to the message announcing our presence
 		if (gethostname(host, sizeof host) < 0)
 			snprintf(host, sizeof host, "localhost");
 	} else {
-		/* message was aborted -- delete the archive file */
+		// message was aborted -- delete the archive file
 		fprintf(stderr, "Message aborted. Removing file\n");
 		rstat = SMFIS_TEMPFAIL;
 	}
+	////
+
 	/* return status */
 	return rstat;
 }
 
 sfsistat pantryc_close(ctx)
 	SMFICTX *ctx; {
-	struct mlfiPriv *priv = MLFIPRIV;
+	mlfiPriv *priv = MLFIPRIV;
 
 	// DEBUG
-	//char c;
-	//while((c = fgetc(priv->pantryc_fp))!=EOF) printf("%c",c);
 	rewind(priv->pantryc_fp);
 
 	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 	GMimeStream *stream;
 	stream = g_mime_stream_file_new(priv->pantryc_fp);
+	//stream = g_mime_stream_file_new(file);
 	if (!stream) {
 		g_warning("Cannot open stream");
 	}
@@ -227,11 +284,10 @@ sfsistat pantryc_close(ctx)
 		g_warning("failed to construct message");
 	}
 
-	//gchar *val;
-	//const gchar *str;
-
+	gchar *val;
+	const gchar *str;
 	g_print("From   : %s\n", g_mime_message_get_sender(msg));
-/*
+
 	val = get_recip(msg, GMIME_RECIPIENT_TYPE_TO);
 	g_print("To     : %s\n", val ? val : "<none>");
 	g_free(val);
@@ -258,11 +314,14 @@ sfsistat pantryc_close(ctx)
 		g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
 		g_free(refsstr);
 	}
-*/
-	GMimeMultipart *m = (GMimeMultipart*)msg->mime_part;
-	printf("Part: %d\n",g_mime_multipart_get_count(m));
-	GMimeObject *o = g_mime_multipart_get_part(m,0);
-	printf("Part: %s\n",g_mime_content_disposition_get_disposition(g_mime_object_get_content_disposition(o)));
+
+	GMimeMultipart *m = (GMimeMultipart*) msg->mime_part;
+	printf("Part: %d\n", g_mime_multipart_get_count(m));
+	/*
+	 GMimeObject *o = g_mime_multipart_get_part(m, 0);
+	 printf("Part: %s\n",
+	 g_mime_content_disposition_get_disposition(
+	 g_mime_object_get_content_disposition(o)));*/
 
 	g_mime_shutdown();
 	////
@@ -275,6 +334,16 @@ sfsistat pantryc_close(ctx)
 		free(priv->pantryc_helofrom);
 	free(priv);
 	smfi_setpriv(ctx, NULL);
+
+	// DEBUG
+	/* close the archive file */
+	if (priv->pantryc_fp != NULL && fclose(priv->pantryc_fp) == EOF) {
+		/* failed; we have to wait until later */
+		fprintf(stderr, "Couldn't close archive file (error: %s)\n",
+				strerror(errno));
+		return SMFIS_TEMPFAIL;
+	}
+	////
 	return SMFIS_CONTINUE;
 }
 

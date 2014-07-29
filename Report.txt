@@ -41,3 +41,7 @@ Mon 07/28/2014:
 - Convert base64 to file
 - Create gmime stream without opening an existing file
 - Learn how to use gmime library
+
+Tue 07/29/2014:
+- Fix bug: Closing archive file at xxfi_cleanup and create a new gmime stream from it causes a memory error
+	--> Close archive file at xxfi_close

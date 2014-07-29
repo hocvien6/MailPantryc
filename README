@@ -1,148 +1,37 @@
 MailPantryc
-==============
-DO THESE FIRST
+===========
+									+--------------+
+									| INTRODUCTION |
+									+--------------+
+									
 
-1. Add C/C++ IDE (CDT) plugin
-http://download.eclipse.org/tools/cdt/releases/8.4
-
-2. Use libmilter to compile a filter
-a. Installing libmilter
-# apt-get install libmilter1.0.1 libmilter1.0.1-dbg libmilter-dev 
-b. 
-- Add library "milter"
-- Add Library search path "/usr/lib/libmilter"
-
-3. Linking with a pthread support library
-Reference:
-http://blog.asteriosk.gr/2009/02/15/adding-pthread-to-eclipse-for-using-posix-threads/comment-page-1/
-
-4. Include glib library:
-Add Include path:
-"/usr/include/glib-2.0" "/usr/lib/i386-linux-gnu/glib-2.0/include"
-Add libraries:
--lglib-2.0
-
-5. Use gmime library to parse an email with MIME standard format
-a. Installing gmime
-# apt-get install libgmime-2.6-dev
-b.
-- Add Include path: "/usr/include/gmime-2.6"
-
-========================
-ECLIPSE PROJECT SETTINGS
-1. Add libraries (-l), Library search path (-L) and Include paths (-I) to project
-In the project properties, go to: C/C++ Build --> Settings
-Then on "Tool Settings" tab:
-- Select "Libraries" under "GCC C Linker" to add libraries (-l) and Library search path (-L):
-- Select "Includes" under "GCC C Compiler" to add Include paths (-I):
-
-2. Fix "program g++ not found in path"
-# apt-get install g++
-- Menu: Window/Preferences/C/C++/Build/Settings/Discovery --> Restore Defaults
-
-3. Run program
-Right-click on project, choose Build Project --> Run!!!
-Ctrl + F11 from Eclipse (optional: Run/Run Configurations...)
-or
-$ ./<program name> [option...]
-
-=============================
-PLUG MAILPANTRYC INTO POSTFIX
-1. Configure Postfix: add this line in /etc/postfix/main.cf (specify MailPantryc as SMTP-only Milter application):
-smtpd_milters = unix:<path to socket>							# socket to plug MailPantryc into
-
-Note:
-The general syntax for listening sockets is as follows:
-	unix:pathname																				#	!!!
-		Connect to the local UNIX-domain server that is bound to the specified pathname.		#	PAY
-		If the smtpd(8) or cleanup(8) process runs chrooted,									#	ATTENTION
-		an absolute pathname is interpreted relative to the Postfix queue directory.			#	!!!
-	inet:host:port
-		Connect to the specified TCP port on the specified local or remote host.
-		The host and port can be specified in numeric or symbolic form.
-Reference:
-http://www.postfix.org/MILTER_README.html
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=496003
-
-2. Plug MailPantryc into Postfix
-1. Create socket
-$ rm <path to socket>												# remove if socket is existing
-$ ./MailPantryc -p <path to socket>									# run MailPantryc with new socket
-$ chmod 777 <path to socket>										# grant permission on new socket
-b. Restart postfix
-# service postfix restart
-
-3. Example:
-Append to /etc/postfix/main.cf
-smtpd_milters = unix:/MailPantryc/f1.sock							# relative path
-Run:
-# mkdir /var/spool/postfix/MailPantryc								# create new directory to store sockets
-or
-# rm /var/spool/postfix/MailPantryc/f1.sock							# remove old socket
-then:
-# ./MailPantryc -p /var/spool/postfix/MailPantryc/f1.sock			# run program with new socket
-	(/var/spool/postfix/ - Postfix queue directory)
-Open new Terminal tab and run:
-# chmod 777 /var/spool/postfix/MailPantryc/f1.sock
-# service postfix restart
-
-Or another way (more simple):
-Modify /etc/postfix/master.cf file:
-change line:
-smtp	   inet  n       -       -       -       -       smtpd
-to:
-smtp	   inet  n       -       n       -       -       smtpd
-(disable chrooted permission)
-Hence, you can use absolute path to specify certain socket
-example: smtpd_milters = unix:/home/<user name>/<path>/f1.sock
-(remember still must change socket file mode to 777)
-Then restart postfix
-Run program:
-$ ./MailPantryc -p Running/f1.sock
-
-Test by using telnet:
-$ telnet localhost 25
-[...]
-mail from: apple@store.com
-rcpt to: microsoft@google.com
-[...]
-data
-from: Steve Jobs
-to: Bill Gates
-An apple a day, keep doctor away
-.
-quit
-
-In addition: this program while running will create temporary file at /tmp/, to remove them, run:
-# rm /tmp/msg*.*
-Or do nothing because the directory is cleared by default at every boot
-Reference:
-http://askubuntu.com/questions/20783/how-is-the-tmp-directory-cleaned-up
-
-==============================
-SEND AN EMAIL WITH ATTACHMENTS
-Install sendEmail:
-# apt-get install sendEmail
-Reference:
-http://backreference.org/2013/05/22/send-email-with-attachments-from-script-or-command-line/
-http://en.wikipedia.org/wiki/MIME
-
-Ex:
-sendEmail -f <sender>@gmail.com -t <recipient>@gmail.com -m "data" -xu sender -xp <password> -s smtp.gmail.com:587
-
-====================
-SOME USEFUL COMMANDS
-1. To get the right flags for GCC, use command:
-$ pkg-config --cflags <lib package>
-Reference:
-http://stackoverflow.com/questions/1146010/why-cant-i-build-a-hello-world-for-glib
-And get library including:
-$ pkg-config --libs <lib package>
-
-=============
-DOCUMENTATION
-1. Glib
-https://developer.gnome.org/glib/
-2. Zlib
-http://www.lemoda.net/c/zlib-open-read/
-https://github.com/kripken/emscripten/issues/124
+									
+									+--------------+
+									| DEPENDENCIES |
+									+--------------+
+									
+- libmilter
+- glib-2.0
+- gmime-2.6									
+									
+									+---------------+
+									| DOCUMENTATION |
+									+---------------+
+									
+									
+									
+									+---------------------+
+									| DIRECTORY STRUCTURE |
+									+---------------------+
+									
+									
+									
+									+------------+
+									| INSTALLING |
+									+------------+
+									
+									
+									
+									+---------------+
+									| CONFIGURATION |
+									+---------------+
