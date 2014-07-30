@@ -48,8 +48,17 @@ Tue 07/29/2014:
 - Change project type to static library
 - Create new executable project for testing
 - Create pantryc-scanner, pantryc-base64
-- Write:
+- Write function:
 	+ pantryc_scanner_get_recip, pantryc_scanner_print_date, pantryc_scanner_get_refs_str function
 		(pantryc-scanner)
 	+ pantryc_base64_decode_gzip function
 		(pantryc-base64)
+		
+Wed 07/30/2014:
+- Write function:
+	+ pantryc_scanner_extract_attachment
+		(pantryc-scanner)
+- Read about Object-Orientation in C:
+Refrence:
+http://stackoverflow.com/questions/1237266/how-can-inheritance-be-modelled-using-c
+http://stackoverflow.com/questions/415452/object-orientation-in-c

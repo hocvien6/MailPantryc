@@ -172,7 +172,6 @@ sfsistat pantryc_cleanup(ctx, ok)
 	char host[512];
 	if (priv == NULL)
 		return rstat;
-	// TESTING
 	// close the archive file
 	if (ok) {
 		// add a header to the message announcing our presence
@@ -183,7 +182,6 @@ sfsistat pantryc_cleanup(ctx, ok)
 		fprintf(stderr, "Message aborted. Removing file\n");
 		rstat = SMFIS_TEMPFAIL;
 	}
-	////
 
 	/* return status */
 	return rstat;
@@ -193,7 +191,6 @@ sfsistat pantryc_close(ctx)
 	SMFICTX *ctx; {
 	mlfiPriv *priv = MLFIPRIV;
 
-	// TESTING
 	rewind(priv->pantryc_fp);
 
 	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
@@ -205,59 +202,62 @@ sfsistat pantryc_close(ctx)
 	}
 
 	GMimeParser *parser;
-	GMimeMessage *msg;
+	GMimeMessage *message;
 	parser = NULL;
-	msg = NULL;
+	message = NULL;
 	parser = g_mime_parser_new_with_stream(stream);
 	if (!parser) {
 		g_warning("failed to create parser");
 	}
-	msg = g_mime_parser_construct_message(parser);
-	if (!msg) {
+	message = g_mime_parser_construct_message(parser);
+	if (!message) {
 		g_warning("failed to construct message");
 	}
 
 	gchar *val;
 	const gchar *str;
-	g_print("From   : %s\n", g_mime_message_get_sender(msg));
+	g_print("From   : %s\n", g_mime_message_get_sender(message));
 
-	val = pantryc_scanner_get_recip(msg, GMIME_RECIPIENT_TYPE_TO);
+	val = pantryc_scanner_get_recip(message, GMIME_RECIPIENT_TYPE_TO);
 	g_print("To     : %s\n", val ? val : "<none>");
 	g_free(val);
 
-	val = pantryc_scanner_get_recip(msg, GMIME_RECIPIENT_TYPE_CC);
+	val = pantryc_scanner_get_recip(message, GMIME_RECIPIENT_TYPE_CC);
 	g_print("Cc     : %s\n", val ? val : "<none>");
 	g_free(val);
 
-	val = pantryc_scanner_get_recip(msg, GMIME_RECIPIENT_TYPE_BCC);
+	val = pantryc_scanner_get_recip(message, GMIME_RECIPIENT_TYPE_BCC);
 	g_print("Bcc    : %s\n", val ? val : "<none>");
 	g_free(val);
 
-	str = g_mime_message_get_subject(msg);
+	str = g_mime_message_get_subject(message);
 	g_print("Subject: %s\n", str ? str : "<none>");
 
-	pantryc_scanner_print_date(msg);
+	val = pantryc_scanner_print_date(message);
+	g_print("Date   : %s\n", val);
 
-	str = g_mime_message_get_message_id(msg);
+	str = g_mime_message_get_message_id(message);
 	g_print("Msg-id : %s\n", str ? str : "<none>");
 
 	{
 		gchar *refsstr;
-		refsstr = pantryc_scanner_get_refs_str(msg);
+		refsstr = pantryc_scanner_get_refs_str(message);
 		g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
 		g_free(refsstr);
 	}
 
-	GMimeMultipart *m = (GMimeMultipart*) msg->mime_part;
-	printf("Part: %d\n", g_mime_multipart_get_count(m));
-	/*
-	 GMimeObject *o = g_mime_multipart_get_part(m, 0);
-	 printf("Part: %s\n",
-	 g_mime_content_disposition_get_disposition(
-	 g_mime_object_get_content_disposition(o)));*/
+	// TESTING
+	int number_of_parts = g_mime_multipart_get_count(
+			(GMimeMultipart*) message->mime_part);
+
+	printf("%d\n", number_of_parts);
+
+	char filename[50];
+	strcpy(filename, "Tmp/");
+	pantryc_scanner_extract_attachment(message, 1, "644", filename);
+	////
 
 	g_mime_shutdown();
-	////
 
 	if (priv == NULL)
 		return SMFIS_CONTINUE;
@@ -268,7 +268,6 @@ sfsistat pantryc_close(ctx)
 	free(priv);
 	smfi_setpriv(ctx, NULL);
 
-	// TESTING
 	/* close the archive file */
 	if (priv->pantryc_fp != NULL && fclose(priv->pantryc_fp) == EOF) {
 		/* failed; we have to wait until later */
@@ -276,7 +275,6 @@ sfsistat pantryc_close(ctx)
 				strerror(errno));
 		return SMFIS_TEMPFAIL;
 	}
-	////
 	return SMFIS_CONTINUE;
 }
 
@@ -394,4 +392,8 @@ int pantryc_run(argc, argv)
 	return smfi_main();
 }
 
+void pantryc_change_working_directory(new_directory)
+	const char *new_directory; {
+	strcpy(pantryc_working_directory, new_directory);
+}
 /* eof */

@@ -4,7 +4,7 @@
 
 #include "../include/pantryc-base64.h"
 
-FILE * pantryc_base64_decode_gzip(text, filename)
+FILE* pantryc_base64_decode_gzip(text, filename)
 	const char *text;char *filename; {
 
 	gsize length;
