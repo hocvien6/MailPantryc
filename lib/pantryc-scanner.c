@@ -4,7 +4,7 @@
 
 #include "../include/pantryc-scanner.h"
 
-gchar* pantryc_scanner_get_recip(message, type)
+gchar* pantryc_scanner__get_recip(message, type)
 	GMimeMessage *message;GMimeRecipientType type; {
 	char *recep;
 	InternetAddressList *receps;
@@ -20,7 +20,7 @@ gchar* pantryc_scanner_get_recip(message, type)
 	return recep;
 }
 
-gchar* pantryc_scanner_print_date(message)
+gchar* pantryc_scanner__print_date(message)
 	GMimeMessage *message; {
 	time_t t;
 	int tz;
@@ -41,7 +41,7 @@ gchar* pantryc_scanner_print_date(message)
 	return NULL;
 }
 
-gchar* pantryc_scanner_get_refs_str(message)
+gchar* pantryc_scanner__get_refs_str(message)
 	GMimeMessage *message; {
 	const gchar *str;
 	const GMimeReferences *cur;
@@ -65,9 +65,9 @@ gchar* pantryc_scanner_get_refs_str(message)
 	return rv;
 }
 
-GMimeStream* pantryc_scanner_extract_attachment(message, index, permission,
-		filename)
-	GMimeMessage *message;int index;const char* permission;char *filename; {
+GMimeStream* pantryc_scanner__extract_attachment(message, index, permission,
+		filepath)
+	GMimeMessage *message;int index;const int permission;const char *filepath; {
 
 	GMimeMultipart *parts = (GMimeMultipart*) message->mime_part;
 	GMimeObject *object = g_mime_multipart_get_part(parts, index);
@@ -81,9 +81,13 @@ GMimeStream* pantryc_scanner_extract_attachment(message, index, permission,
 		return NULL;
 
 	GMimePart *part = (GMimePart*) object;
-	strcat(filename, g_mime_part_get_filename(part));
-	printf("%s\n",filename); // TESTING
-	int fd = open(filename, O_CREAT | O_WRONLY | O_EXCL, permission);
+	const char *filename = g_mime_part_get_filename(part);
+	char *filefullname;
+	filefullname = (char*) malloc(
+			(strlen(filepath) + strlen(filename)) * sizeof(char));
+	strcpy(filefullname, filepath);
+	strcat(filefullname, filename);
+	int fd = open(filefullname, O_CREAT | O_WRONLY | O_EXCL, permission);
 
 	GMimeStream *stream = g_mime_stream_fs_new(fd);
 	GMimeDataWrapper *data = g_mime_part_get_content_object(part);

@@ -1,14 +1,15 @@
 #ifndef PANTRYC_H_
 #define PANTRYC_H_
 
-#include <pantryc-scanner.h>
-#include <pantryc-base64.h>
+#include <pantryc-milter.h>
 
-char *pantryc_working_directory;
+void pantryc__change_working_directory(const char *directory);
+void pantryc__change_attachment_permission(const int permission);
+bool pantryc__set_port(char *port);
+bool pantryc__set_time_out(char *timeout);
 /**
  * Pantryc milter start
  */
-int pantryc_run(int argc, char **argv);
-void pantryc_change_working_directory(const char *new_directory);
+int pantryc__run(int argc, char **argv);
 
 #endif /* PANTRYC_H_ */
