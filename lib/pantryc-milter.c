@@ -21,7 +21,7 @@ sfsistat pantryc_milter__cleanup(ctx, ok)
 			snprintf(host, sizeof host, "localhost");
 	} else {
 		// message was aborted -- delete the archive file
-		fprintf(stderr, "Message aborted. Removing file\n");
+		fprintf(data->log, "Message aborted. Removing file\n");
 		rstat = SMFIS_TEMPFAIL;
 	}
 
@@ -49,6 +49,16 @@ sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
+
+	// TODO rename log file
+	char *logfullname;
+	logfullname = (char*) malloc(100 * sizeof(char));
+	strcpy(logfullname, pantryc__working_directory);
+	strcat(logfullname, "log.txt");
+	data->log = fopen(logfullname, "w+");
+	if(data->log == NULL) exit(EX_NOINPUT);
+	////
+
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -73,6 +83,11 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	if (data->helofrom != NULL)
 		free(data->helofrom);
 	data->helofrom = buf;
+	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
+		(void) fclose(data->mail);
+		(void) pantryc_milter__cleanup(ctx, FALSE);
+		return SMFIS_TEMPFAIL;
+	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -80,7 +95,6 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	int argc = 0;
-	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 
 #ifdef WIN32
 	char szFilename[MAX_PATH]= {0};
@@ -101,11 +115,6 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 #else /* WIN32 */
 
 #endif /* WIN32 */
-	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
-		(void) fclose(data->mail);
-		(void) pantryc_milter__cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
@@ -152,7 +161,8 @@ sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 	/* output body block to log file */
 	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
-		fprintf(stderr, "Couldn't write file (error: %s)\n", strerror(errno));
+		fprintf(data->log, "Couldn't write file (error: %s)\n",
+				strerror(errno));
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -200,32 +210,32 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 
 	gchar *val;
 	const gchar *str;
-	g_print("From   : %s\n", g_mime_message_get_sender(message));
+	fprintf(data->log, "From   : %s\n", g_mime_message_get_sender(message));
 
 	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_TO);
-	g_print("To     : %s\n", val ? val : "<none>");
+	fprintf(data->log, "To     : %s\n", val ? val : "<none>");
 	g_free(val);
 
 	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_CC);
-	g_print("Cc     : %s\n", val ? val : "<none>");
+	fprintf(data->log, "Cc     : %s\n", val ? val : "<none>");
 	g_free(val);
 
 	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_BCC);
-	g_print("Bcc    : %s\n", val ? val : "<none>");
+	fprintf(data->log, "Bcc    : %s\n", val ? val : "<none>");
 	g_free(val);
 
 	str = g_mime_message_get_subject(message);
-	g_print("Subject: %s\n", str ? str : "<none>");
+	fprintf(data->log, "Subject: %s\n", str ? str : "<none>");
 
 	val = pantryc_scanner__get_date(message);
-	g_print("Date   : %s\n", val);
+	fprintf(data->log, "Date   : %s\n", val);
 
 	str = g_mime_message_get_message_id(message);
-	g_print("Msg-id : %s\n", str ? str : "<none>");
+	fprintf(data->log, "Msg-id : %s\n", str ? str : "<none>");
 
 	gchar *refsstr;
 	refsstr = pantryc_scanner__get_refs_str(message);
-	g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
+	fprintf(data->log, "Refs   : %s\n", refsstr ? refsstr : "<none>");
 	g_free(refsstr);
 
 	int number_of_parts = g_mime_multipart_get_count(
@@ -247,10 +257,14 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 	free(data);
 	smfi_setpriv(ctx, NULL);
 
+	if (data->log == NULL || fclose(data->log) == EOF) {
+		fprintf(data->log, "Couldn't close log file (error: %s)\n",
+				strerror(errno));
+	}
 	/* close the archive file */
 	if (data->mail != NULL && fclose(data->mail) == EOF) {
 		/* failed; we have to wait until later */
-		fprintf(stderr, "Couldn't close archive file (error: %s)\n",
+		fprintf(data->log, "Couldn't close archive file (error: %s)\n",
 				strerror(errno));
 		return SMFIS_TEMPFAIL;
 	}

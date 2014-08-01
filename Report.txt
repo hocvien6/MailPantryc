@@ -70,3 +70,4 @@ Fri 08/01/2014:
 	+ pantryc__change_working_directory, pantryc__change_attachment_permission, pantryc__set_port, pantryc__set_time_out
 		(pantryc)
 - Rename - refactor (Pantryc rocks!!)
+- Write mail information to log file
