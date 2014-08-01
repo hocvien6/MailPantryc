@@ -20,7 +20,7 @@ gchar* pantryc_scanner__get_recip(message, type)
 	return recep;
 }
 
-gchar* pantryc_scanner__print_date(message)
+gchar* pantryc_scanner__get_date(message)
 	GMimeMessage *message; {
 	time_t t;
 	int tz;
@@ -46,23 +46,24 @@ gchar* pantryc_scanner__get_refs_str(message)
 	const gchar *str;
 	const GMimeReferences *cur;
 	GMimeReferences *mime_refs;
-	gchar *rv;
+	gchar *references;
 
 	str = g_mime_object_get_header(GMIME_OBJECT(message), "References");
 	if (!str)
 		return NULL;
 
 	mime_refs = g_mime_references_decode(str);
-	for (rv = NULL, cur = mime_refs; cur;
-			cur = g_mime_references_get_next(cur)) {
+	for (references = NULL, cur = mime_refs; cur; cur =
+			g_mime_references_get_next(cur)) {
 
-		const char* messageid;
-		messageid = g_mime_references_get_message_id(cur);
-		rv = g_strdup_printf("%s%s%s", rv ? rv : "", rv ? "," : "", messageid);
+		const char* messageId;
+		messageId = g_mime_references_get_message_id(cur);
+		references = g_strdup_printf("%s%s%s", references ? references : "",
+				references ? "," : "", messageId);
 	}
 	g_mime_references_free(mime_refs);
 
-	return rv;
+	return references;
 }
 
 GMimeStream* pantryc_scanner__extract_attachment(message, index, permission,
@@ -84,7 +85,7 @@ GMimeStream* pantryc_scanner__extract_attachment(message, index, permission,
 	const char *filename = g_mime_part_get_filename(part);
 	char *filefullname;
 	filefullname = (char*) malloc(
-			(strlen(filepath) + strlen(filename)) * sizeof(char));
+			(strlen(filepath) + strlen(filename) + 1) * sizeof(char));
 	strcpy(filefullname, filepath);
 	strcat(filefullname, filename);
 	int fd = open(filefullname, O_CREAT | O_WRONLY | O_EXCL, permission);

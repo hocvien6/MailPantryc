@@ -3,6 +3,8 @@
 
 #include <pantryc-milter.h>
 
+typedef struct smfiDesc pantrycMilter; /* structure mail filter Describe */
+
 void pantryc__change_working_directory(const char *directory);
 void pantryc__change_attachment_permission(const int permission);
 bool pantryc__set_port(char *port);

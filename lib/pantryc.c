@@ -2,13 +2,12 @@
 #include <string.h>
 #include <sysexits.h>
 #include <libmilter/mfapi.h>
-#include <gmime/gmime.h>
 
 #include "../include/pantryc.h"
 
 bool setport = FALSE;
 
-struct smfiDesc pantrycMilter = { "PantrycMilter", /* filter name */
+pantrycMilter milter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
 SMFIF_ADDHDRS | SMFIF_ADDRCPT,
 /* flags */
@@ -73,11 +72,11 @@ bool pantryc__set_time_out(timeout)
 int pantryc__run(argc, argv)
 	int argc;char **argv; {
 	if (!setport) {
-		fprintf(stderr, "%s: Missing required -p argument\n", argv[0]);
+		//fprintf(stderr, "%s: Missing required -p argument\n", argv[0]);
 		exit(EX_USAGE);
 	}
-	if (smfi_register(pantrycMilter) == MI_FAILURE) {
-		fprintf(stderr, "smfi_register failed\n");
+	if (smfi_register(milter) == MI_FAILURE) {
+		//fprintf(stderr, "smfi_register failed\n");
 		exit(EX_UNAVAILABLE);
 	}
 	return smfi_main();

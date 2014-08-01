@@ -5,14 +5,14 @@
 
 #include "../include/pantryc-milter.h"
 
-#define MLFIPRIV			((pantrycPriv *) smfi_getpriv(ctx))
+#define GET_PANTRYC_PRIVATE_DATA			((pantrycData *) smfi_getpriv(ctx))
 
 sfsistat pantryc_milter__cleanup(ctx, ok)
 	SMFICTX *ctx;bool ok; {
 	sfsistat rstat = SMFIS_CONTINUE;
-	pantrycPriv *priv = MLFIPRIV;
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 	char host[512];
-	if (priv == NULL)
+	if (data == NULL)
 		return rstat;
 	// close the archive file
 	if (ok) {
@@ -31,21 +31,21 @@ sfsistat pantryc_milter__cleanup(ctx, ok)
 
 sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 	SMFICTX *ctx;char *hostname;_SOCK_ADDR *hostaddr; {
-	pantrycPriv *priv;
+	pantrycData *data;
 	char *ident;
 	/* allocate some private memory */
-	priv = malloc(sizeof *priv);
-	if (priv == NULL) {
+	data = malloc(sizeof *data);
+	if (data == NULL) {
 		/* can't accept this message right now */
 		return SMFIS_TEMPFAIL;
 	}
-	memset(priv, '\0', sizeof *priv);
+	memset(data, '\0', sizeof *data);
 	/* save the private data */
-	smfi_setpriv(ctx, priv);
+	smfi_setpriv(ctx, data);
 	ident = smfi_getsymval(ctx, "_");
 	if (ident == NULL)
 		ident = "???";
-	if ((priv->connectfrom = strdup(ident)) == NULL) {
+	if ((data->connectfrom = strdup(ident)) == NULL) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -58,7 +58,7 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	size_t len;
 	char *tls;
 	char *buf;
-	pantrycPriv *priv = MLFIPRIV;
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 	tls = smfi_getsymval(ctx, "{tls_version}");
 	if (tls == NULL)
 		tls = "No TLS";
@@ -70,9 +70,9 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 		return SMFIS_TEMPFAIL;
 	}
 	snprintf(buf, len, "%s, %s", helohost, tls);
-	if (priv->helofrom != NULL)
-		free(priv->helofrom);
-	priv->helofrom = buf;
+	if (data->helofrom != NULL)
+		free(data->helofrom);
+	data->helofrom = buf;
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -80,7 +80,7 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	SMFICTX *ctx;char **argv; {
 	int argc = 0;
-	pantrycPriv *priv = MLFIPRIV;
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 
 #ifdef WIN32
 	char szFilename[MAX_PATH]= {0};
@@ -93,7 +93,7 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	if ((priv->pantryc_fname = strdup(_tempnam(szFilename, "msgPantryc."))) == NULL)
+	if ((data->pantryc_fname = strdup(_tempnam(szFilename, "msgPantryc."))) == NULL)
 	{
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
@@ -101,8 +101,8 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 #else /* WIN32 */
 
 #endif /* WIN32 */
-	if ((priv->file = open_memstream(&priv->buffer, &priv->size)) == NULL) {
-		(void) fclose(priv->file);
+	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
+		(void) fclose(data->mail);
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -126,7 +126,8 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 sfsistat pantryc_milter__xxfi_header(ctx, headerf, headerv)
 	SMFICTX *ctx;char *headerf;char *headerv; {
 	/* write the header to the log file */
-	if (fprintf(MLFIPRIV->file, "%s: %s\n", headerf, headerv) == EOF) {
+	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", headerf,
+			headerv) == EOF) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -137,7 +138,7 @@ sfsistat pantryc_milter__xxfi_header(ctx, headerf, headerv)
 sfsistat pantryc_milter__xxfi_eoh(ctx)
 	SMFICTX *ctx; {
 	/* output the blank line between the header and the body */
-	if (fprintf(MLFIPRIV->file, "\n") == EOF) {
+	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "\n") == EOF) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -147,9 +148,9 @@ sfsistat pantryc_milter__xxfi_eoh(ctx)
 
 sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
-	pantrycPriv *priv = MLFIPRIV;
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 	/* output body block to log file */
-	if (fwrite(bodyp, bodylen, 1, priv->file) != 1) {
+	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
 		fprintf(stderr, "Couldn't write file (error: %s)\n", strerror(errno));
 		(void) pantryc_milter__cleanup(ctx, FALSE);
@@ -172,13 +173,13 @@ sfsistat pantryc_milter__xxfi_abort(ctx)
 
 sfsistat pantryc_milter__xxfi_close(ctx)
 	SMFICTX *ctx; {
-	pantrycPriv *priv = MLFIPRIV;
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 
-	rewind(priv->file);
+	rewind(data->mail);
 
 	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 	GMimeStream *stream;
-	stream = g_mime_stream_file_new(priv->file);
+	stream = g_mime_stream_file_new(data->mail);
 	//stream = g_mime_stream_file_new(file);
 	if (!stream) {
 		g_warning("Cannot open stream");
@@ -216,43 +217,38 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 	str = g_mime_message_get_subject(message);
 	g_print("Subject: %s\n", str ? str : "<none>");
 
-	val = pantryc_scanner__print_date(message);
+	val = pantryc_scanner__get_date(message);
 	g_print("Date   : %s\n", val);
 
 	str = g_mime_message_get_message_id(message);
 	g_print("Msg-id : %s\n", str ? str : "<none>");
 
-	{
-		gchar *refsstr;
-		refsstr = pantryc_scanner__get_refs_str(message);
-		g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
-		g_free(refsstr);
-	}
+	gchar *refsstr;
+	refsstr = pantryc_scanner__get_refs_str(message);
+	g_print("Refs   : %s\n", refsstr ? refsstr : "<none>");
+	g_free(refsstr);
 
-	// TESTING
 	int number_of_parts = g_mime_multipart_get_count(
 			(GMimeMultipart*) message->mime_part);
-
+	data->permission = pantryc__attachment_permission;
 	int i;
 	for (i = 0; i <= number_of_parts - 1; i++) {
-		pantryc_scanner__extract_attachment(message, i,
-				pantryc__attachment_permission, pantryc__working_directory);
+		pantryc_scanner__extract_attachment(message, i, data->permission,
+				pantryc__working_directory);
 	}
-	////
-
 	g_mime_shutdown();
 
-	if (priv == NULL)
+	if (data == NULL)
 		return SMFIS_CONTINUE;
-	if (priv->connectfrom != NULL)
-		free(priv->connectfrom);
-	if (priv->helofrom != NULL)
-		free(priv->helofrom);
-	free(priv);
+	if (data->connectfrom != NULL)
+		free(data->connectfrom);
+	if (data->helofrom != NULL)
+		free(data->helofrom);
+	free(data);
 	smfi_setpriv(ctx, NULL);
 
 	/* close the archive file */
-	if (priv->file != NULL && fclose(priv->file) == EOF) {
+	if (data->mail != NULL && fclose(data->mail) == EOF) {
 		/* failed; we have to wait until later */
 		fprintf(stderr, "Couldn't close archive file (error: %s)\n",
 				strerror(errno));

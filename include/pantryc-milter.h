@@ -7,13 +7,15 @@
 char *pantryc__working_directory;
 int pantryc__attachment_permission;
 
-typedef struct pantrycPriv {
+typedef struct pantrycData {
 	char *buffer;
 	size_t size;
 	char *connectfrom;
 	char *helofrom;
-	FILE *file;
-} pantrycPriv;
+	FILE *mail;
+	FILE *log;
+	int permission; /* attachment permission */
+} pantrycData;
 
 sfsistat pantryc_milter__cleanup(SMFICTX *ctx, bool ok);
 
