@@ -56,7 +56,8 @@ sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 	strcpy(logfullname, pantryc__working_directory);
 	strcat(logfullname, "log.txt");
 	data->log = fopen(logfullname, "w+");
-	if(data->log == NULL) exit(EX_NOINPUT);
+	if (data->log == NULL)
+		exit(EX_NOINPUT);
 	////
 
 	/* continue processing */
@@ -83,6 +84,7 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	if (data->helofrom != NULL)
 		free(data->helofrom);
 	data->helofrom = buf;
+	printf("%s\n",data->helofrom); // TESTING
 	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
 		(void) fclose(data->mail);
 		(void) pantryc_milter__cleanup(ctx, FALSE);
@@ -118,6 +120,12 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
+
+	// TESTING
+	while (*argv++ != NULL)
+		printf("%s\n", *argv);
+	////
+
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -134,7 +142,7 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 
 sfsistat pantryc_milter__xxfi_header(ctx, headerf, headerv)
 	SMFICTX *ctx;char *headerf;char *headerv; {
-	/* write the header to the log file */
+	/* write the header to the mail file */
 	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", headerf,
 			headerv) == EOF) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
@@ -158,7 +166,7 @@ sfsistat pantryc_milter__xxfi_eoh(ctx)
 sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
 	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
-	/* output body block to log file */
+	/* output body block to mail file */
 	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
 		fprintf(data->log, "Couldn't write file (error: %s)\n",
@@ -261,6 +269,13 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 		fprintf(data->log, "Couldn't close log file (error: %s)\n",
 				strerror(errno));
 	}
+
+	// TESTING
+	char c;
+	while ((c = fgetc(data->mail)) != EOF)
+		printf("%c", c);
+	////
+
 	/* close the archive file */
 	if (data->mail != NULL && fclose(data->mail) == EOF) {
 		/* failed; we have to wait until later */

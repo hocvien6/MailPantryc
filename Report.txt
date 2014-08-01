@@ -9,7 +9,7 @@ Link github: https://github.com/hocvien6/MailPantryc
 
 ========== WEEK 3 ==========
 Tue 07/15/2014:
-- Add CDT plugin to Eclipse (C/C++ IDE)
+- Install CDT plugin to Eclipse (C/C++ IDE)
 - Create MailPantryc Project
 - Compile and very-first Run
 
@@ -41,6 +41,7 @@ Mon 07/28/2014:
 - Convert base64 to file
 - Create gmime stream without opening an existing file
 - Learn how to use gmime library
+- Rename project to pantryc
 
 Tue 07/29/2014:
 - Fix bug: Closing archive file at xxfi_cleanup and create a new gmime stream from it causes a memory error
@@ -71,3 +72,6 @@ Fri 08/01/2014:
 		(pantryc)
 - Rename - refactor (Pantryc rocks!!)
 - Write mail information to log file
+- Send mail using `telnet' command line --> encounter problem
+	From /var/log/mail.log:
+	"warning: milter" [...] "can't read SMFIC_HEADER reply packet header: Success"
