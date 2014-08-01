@@ -4,7 +4,7 @@
 
 gchar* pantryc_scanner__get_recip(GMimeMessage *message, GMimeRecipientType type);
 gchar* pantryc_scanner__get_date(GMimeMessage *message);
-gchar* pantryc_scanner__get_refs_str(GMimeMessage *message);
+gchar* pantryc_scanner__get_references(GMimeMessage *message);
 
 /**
  * Extract attached file from message

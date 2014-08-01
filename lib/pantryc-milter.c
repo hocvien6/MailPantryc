@@ -9,11 +9,11 @@
 
 sfsistat pantryc_milter__cleanup(ctx, ok)
 	SMFICTX *ctx;bool ok; {
-	sfsistat rstat = SMFIS_CONTINUE;
+	sfsistat status = SMFIS_CONTINUE;
 	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 	char host[512];
 	if (data == NULL)
-		return rstat;
+		return status;
 	// close the archive file
 	if (ok) {
 		// add a header to the message announcing our presence
@@ -22,11 +22,11 @@ sfsistat pantryc_milter__cleanup(ctx, ok)
 	} else {
 		// message was aborted -- delete the archive file
 		fprintf(data->log, "Message aborted. Removing file\n");
-		rstat = SMFIS_TEMPFAIL;
+		status = SMFIS_TEMPFAIL;
 	}
 
 	/* return status */
-	return rstat;
+	return status;
 }
 
 sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
@@ -140,11 +140,12 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_header(ctx, headerf, headerv)
-	SMFICTX *ctx;char *headerf;char *headerv; {
+sfsistat pantryc_milter__xxfi_header(ctx, name, value)
+	SMFICTX *ctx;char *name;char *value; {
 	/* write the header to the mail file */
-	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", headerf,
-			headerv) == EOF) {
+	printf("header: %s, %s\n",name,value); // TESTING
+	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", name,
+			value) == EOF) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -242,7 +243,7 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 	fprintf(data->log, "Msg-id : %s\n", str ? str : "<none>");
 
 	gchar *refsstr;
-	refsstr = pantryc_scanner__get_refs_str(message);
+	refsstr = pantryc_scanner__get_references(message);
 	fprintf(data->log, "Refs   : %s\n", refsstr ? refsstr : "<none>");
 	g_free(refsstr);
 
@@ -271,9 +272,11 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 	}
 
 	// TESTING
+	/*
 	char c;
 	while ((c = fgetc(data->mail)) != EOF)
 		printf("%c", c);
+		*/
 	////
 
 	/* close the archive file */

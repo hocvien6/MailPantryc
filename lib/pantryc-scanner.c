@@ -6,60 +6,60 @@
 
 gchar* pantryc_scanner__get_recip(message, type)
 	GMimeMessage *message;GMimeRecipientType type; {
-	char *recep;
+	char *recip;
 	InternetAddressList *receps;
 
 	receps = g_mime_message_get_recipients(message, type);
-	recep = (char*) internet_address_list_to_string(receps, FALSE);
+	recip = (char*) internet_address_list_to_string(receps, FALSE);
 
-	if (!recep || !*recep) {
-		g_free(recep);
+	if (!recip || !*recip) {
+		g_free(recip);
 		return NULL;
 	}
 
-	return recep;
+	return recip;
 }
 
 gchar* pantryc_scanner__get_date(message)
 	GMimeMessage *message; {
-	time_t t;
-	int tz;
+	time_t timer;
+	int timezone;
 	char buf[64];
-	size_t len;
-	struct tm *t_m;
+	size_t length;
+	struct tm *time;
 
-	g_mime_message_get_date(message, &t, &tz);
-	t_m = localtime(&t);
+	g_mime_message_get_date(message, &timer, &timezone);
+	time = localtime(&timer);
 
-	len = strftime(buf, sizeof(buf) - 1, "%c", t_m);
+	length = strftime(buf, sizeof(buf) - 1, "%c", time);
 
-	if (len > 0) {
+	if (length > 0) {
 		gchar *date = (gchar*) malloc(72 * sizeof(gchar));
-		sprintf(date, "%s (%s%04d)\n", buf, tz < 0 ? "-" : "+", tz);
+		sprintf(date, "%s (%s%04d)\n", buf, timezone < 0 ? "-" : "+", timezone);
 		return date;
 	}
 	return NULL;
 }
 
-gchar* pantryc_scanner__get_refs_str(message)
+gchar* pantryc_scanner__get_references(message)
 	GMimeMessage *message; {
-	const gchar *str;
+	const gchar *header;
 	const GMimeReferences *cur;
 	GMimeReferences *mime_refs;
 	gchar *references;
 
-	str = g_mime_object_get_header(GMIME_OBJECT(message), "References");
-	if (!str)
+	header = g_mime_object_get_header(GMIME_OBJECT(message), "References");
+	if (!header)
 		return NULL;
 
-	mime_refs = g_mime_references_decode(str);
+	mime_refs = g_mime_references_decode(header);
 	for (references = NULL, cur = mime_refs; cur; cur =
 			g_mime_references_get_next(cur)) {
 
-		const char* messageId;
-		messageId = g_mime_references_get_message_id(cur);
+		const char* id;
+		id = g_mime_references_get_message_id(cur);
 		references = g_strdup_printf("%s%s%s", references ? references : "",
-				references ? "," : "", messageId);
+				references ? "," : "", id);
 	}
 	g_mime_references_free(mime_refs);
 

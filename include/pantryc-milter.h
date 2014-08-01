@@ -24,7 +24,7 @@ _SOCK_ADDR *hostaddr);
 sfsistat pantryc_milter__xxfi_helo(SMFICTX *ctx, char *helohost);
 sfsistat pantryc_milter__xxfi_envfrom(SMFICTX *ctx, char **argv);
 sfsistat pantryc_milter__xxfi_envrcpt(SMFICTX *ctx, char **argv);
-sfsistat pantryc_milter__xxfi_header(SMFICTX *ctx, char *headerf, char *headerv);
+sfsistat pantryc_milter__xxfi_header(SMFICTX *ctx, char *name, char *value);
 sfsistat pantryc_milter__xxfi_eoh(SMFICTX *ctxx);
 sfsistat pantryc_milter__xxfi_body(SMFICTX *ctx, unsigned char *bodyp,
 		size_t bodylen);
