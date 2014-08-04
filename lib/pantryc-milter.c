@@ -14,7 +14,6 @@ sfsistat pantryc_milter__cleanup(ctx, ok)
 	char host[512];
 	if (data == NULL)
 		return status;
-	// close the archive file
 	if (ok) {
 		// add a header to the message announcing our presence
 		if (gethostname(host, sizeof host) < 0)
@@ -59,6 +58,11 @@ sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 	if (data->log == NULL)
 		exit(EX_NOINPUT);
 	////
+	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
+		(void) fclose(data->mail);
+		(void) pantryc_milter__cleanup(ctx, FALSE);
+		return SMFIS_TEMPFAIL;
+	}
 
 	/* continue processing */
 	return SMFIS_CONTINUE;
@@ -84,12 +88,6 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	if (data->helofrom != NULL)
 		free(data->helofrom);
 	data->helofrom = buf;
-	printf("helo: %s\n",data->helofrom); // TESTING
-	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
-		(void) fclose(data->mail);
-		(void) pantryc_milter__cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -120,12 +118,6 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
-
-	// TESTING
-	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
-	printf("%s\n",mailaddr);
-	////
-
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -143,9 +135,7 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 sfsistat pantryc_milter__xxfi_header(ctx, name, value)
 	SMFICTX *ctx;char *name;char *value; {
 	/* write the header to the mail file */
-	printf("header: %s, %s\n",name,value); // TESTING
-	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", name,
-			value) == EOF) {
+	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", name, value) == EOF) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -270,15 +260,6 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 		fprintf(data->log, "Couldn't close log file (error: %s)\n",
 				strerror(errno));
 	}
-
-	// TESTING
-	/*
-	char c;
-	while ((c = fgetc(data->mail)) != EOF)
-		printf("%c", c);
-		*/
-	////
-
 	/* close the archive file */
 	if (data->mail != NULL && fclose(data->mail) == EOF) {
 		/* failed; we have to wait until later */

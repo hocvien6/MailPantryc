@@ -81,7 +81,7 @@ $ gcc -o run run.c \
 Reference:
 http://stackoverflow.com/questions/45135/linker-order-gcc
 
-=============================
+=========================
 PLUG PANTRYC INTO POSTFIX
 1. Configure Postfix: add this line in /etc/postfix/main.cf (specify pantryc as SMTP-only Milter application):
 smtpd_milters = unix:<path to socket>							# socket to plug pantryc into
@@ -181,3 +181,8 @@ https://developer.gnome.org/glib/
 2. Zlib
 http://www.lemoda.net/c/zlib-open-read/
 https://github.com/kripken/emscripten/issues/124
+
+========
+REMEMBER
+1. Difference from send email using `telnet localhost 25' and `sendEmail' command line:
+`sendEmail' call "helo" command every time connect to MTA service, but `telnet' doesn't
