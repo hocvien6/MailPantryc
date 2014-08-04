@@ -7,6 +7,8 @@
 
 #define GET_PANTRYC_PRIVATE_DATA			((pantrycData *) smfi_getpriv(ctx))
 
+void pantryc_milter__free_pantrycData(pantrycData *data);
+
 sfsistat pantryc_milter__cleanup(ctx, ok)
 	SMFICTX *ctx;bool ok; {
 	sfsistat status = SMFIS_CONTINUE;
@@ -24,6 +26,21 @@ sfsistat pantryc_milter__cleanup(ctx, ok)
 		status = SMFIS_TEMPFAIL;
 	}
 
+	// TESTING
+	printf("cleanup\n");
+	if (data->log != NULL && fclose(data->log) == EOF) {
+		fprintf(data->log, "Couldn't close log file (error: %s)\n",
+				strerror(errno));
+		status = SMFIS_TEMPFAIL;
+	}
+	/* close the archive file */
+	if (data->mail != NULL && fclose(data->mail) == EOF) {
+		/* failed; we have to wait until later */
+		fprintf(data->log, "Couldn't close archive file (error: %s)\n",
+				strerror(errno));
+		status = SMFIS_TEMPFAIL;
+	}
+	////
 	/* return status */
 	return status;
 }
@@ -45,25 +62,10 @@ sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 	if (ident == NULL)
 		ident = "???";
 	if ((data->connectfrom = strdup(ident)) == NULL) {
+		printf("connect\n"); // TESTING
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
-
-	// TODO rename log file
-	char *logfullname;
-	logfullname = (char*) malloc(100 * sizeof(char));
-	strcpy(logfullname, pantryc__working_directory);
-	strcat(logfullname, "log.txt");
-	data->log = fopen(logfullname, "w+");
-	if (data->log == NULL)
-		exit(EX_NOINPUT);
-	////
-	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
-		(void) fclose(data->mail);
-		(void) pantryc_milter__cleanup(ctx, FALSE);
-		return SMFIS_TEMPFAIL;
-	}
-
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -81,6 +83,7 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 		helohost = "???";
 	len = strlen(tls) + strlen(helohost) + 3;
 	if ((buf = (char*) malloc(len)) == NULL) {
+		printf("helo\n"); // TESTING
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -115,6 +118,25 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 #else /* WIN32 */
 
 #endif /* WIN32 */
+	// TESTING, TODO rename log file, #logfullname
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
+	char *logfullname;
+	logfullname = (char*) malloc(100 * sizeof(char));
+	strcpy(logfullname, pantryc__working_directory);
+	strcat(logfullname, "log.txt");
+	if ((data->log = fopen(logfullname, "w+")) == NULL) {
+		(void) fclose(data->log);
+		printf("envfrom log\n"); // TESTING
+		(void) pantryc_milter__cleanup(ctx, FALSE);
+		return SMFIS_TEMPFAIL;
+	}
+	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
+		(void) fclose(data->mail);
+		printf("envfrom mail\n"); // TESTING
+		(void) pantryc_milter__cleanup(ctx, FALSE);
+		return SMFIS_TEMPFAIL;
+	}
+	////
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
@@ -136,6 +158,7 @@ sfsistat pantryc_milter__xxfi_header(ctx, name, value)
 	SMFICTX *ctx;char *name;char *value; {
 	/* write the header to the mail file */
 	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "%s: %s\n", name, value) == EOF) {
+		printf("header\n"); // TESTING
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -147,6 +170,7 @@ sfsistat pantryc_milter__xxfi_eoh(ctx)
 	SMFICTX *ctx; {
 	/* output the blank line between the header and the body */
 	if (fprintf(GET_PANTRYC_PRIVATE_DATA->mail, "\n") == EOF) {
+		printf("eoh\n"); // TESTING
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -162,6 +186,7 @@ sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 		/* write failed */
 		fprintf(data->log, "Couldn't write file (error: %s)\n",
 				strerror(errno));
+		printf("body\n"); // TESTING
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -172,24 +197,13 @@ sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 sfsistat pantryc_milter__xxfi_eom(ctx)
 	SMFICTX *ctx; {
 	bool ok = TRUE;
-	return pantryc_milter__cleanup(ctx, ok);
-}
-
-sfsistat pantryc_milter__xxfi_abort(ctx)
-	SMFICTX *ctx; {
-	return pantryc_milter__cleanup(ctx, FALSE);
-}
-
-sfsistat pantryc_milter__xxfi_close(ctx)
-	SMFICTX *ctx; {
+	printf("eom\n"); // TESTING
 	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
-
 	rewind(data->mail);
 
 	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 	GMimeStream *stream;
 	stream = g_mime_stream_file_new(data->mail);
-	//stream = g_mime_stream_file_new(file);
 	if (!stream) {
 		g_warning("Cannot open stream");
 	}
@@ -237,36 +251,36 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 	fprintf(data->log, "Refs   : %s\n", refsstr ? refsstr : "<none>");
 	g_free(refsstr);
 
-	int number_of_parts = g_mime_multipart_get_count(
-			(GMimeMultipart*) message->mime_part);
-	data->permission = pantryc__attachment_permission;
-	int i;
-	for (i = 0; i <= number_of_parts - 1; i++) {
-		pantryc_scanner__extract_attachment(message, i, data->permission,
-				pantryc__working_directory);
+	if (GMIME_IS_MULTIPART(message->mime_part)) {
+		int number_of_parts = g_mime_multipart_get_count(
+				(GMimeMultipart*) message->mime_part);
+		data->permission = pantryc__attachment_permission;
+		int i;
+		for (i = 0; i <= number_of_parts - 1; i++) {
+			pantryc_scanner__extract_attachment(message, i, data->permission,
+					pantryc__working_directory);
+		}
 	}
-	g_mime_shutdown();
+	return pantryc_milter__cleanup(ctx, ok);
+}
+
+sfsistat pantryc_milter__xxfi_abort(ctx)
+	SMFICTX *ctx; {
+	printf("abort\n"); // TESTING
+	return pantryc_milter__cleanup(ctx, FALSE);
+}
+
+sfsistat pantryc_milter__xxfi_close(ctx)
+	SMFICTX *ctx; {
+	pantrycData *data = GET_PANTRYC_PRIVATE_DATA;
 
 	if (data == NULL)
 		return SMFIS_CONTINUE;
-	if (data->connectfrom != NULL)
-		free(data->connectfrom);
-	if (data->helofrom != NULL)
-		free(data->helofrom);
-	free(data);
+	else
+		pantryc_milter__free_pantrycData(data);
 	smfi_setpriv(ctx, NULL);
 
-	if (data->log == NULL || fclose(data->log) == EOF) {
-		fprintf(data->log, "Couldn't close log file (error: %s)\n",
-				strerror(errno));
-	}
-	/* close the archive file */
-	if (data->mail != NULL && fclose(data->mail) == EOF) {
-		/* failed; we have to wait until later */
-		fprintf(data->log, "Couldn't close archive file (error: %s)\n",
-				strerror(errno));
-		return SMFIS_TEMPFAIL;
-	}
+	g_mime_shutdown();
 	return SMFIS_CONTINUE;
 }
 
@@ -284,3 +298,20 @@ sfsistat pantryc_milter__xxfi_negotiate(ctx, f0, f1, f2, f3, pf0, pf1, pf2, pf3)
 	SMFICTX *ctx;unsigned long f0;unsigned long f1;unsigned long f2;unsigned long f3;unsigned long *pf0;unsigned long *pf1;unsigned long *pf2;unsigned long *pf3; {
 	return SMFIS_ALL_OPTS;
 }
+
+/* Private function */
+void pantryc_milter__free_pantrycData(data)
+	pantrycData *data; {
+	if (data->buffer != NULL)
+		free(data->buffer);
+	if (data->connectfrom != NULL)
+		free(data->connectfrom);
+	if (data->helofrom != NULL)
+		free(data->helofrom);
+	if (data->mail != NULL)
+		free(data->mail);
+	if (data->log != NULL)
+		free(data->log);
+	free(data);
+}
+
