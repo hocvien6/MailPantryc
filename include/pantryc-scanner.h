@@ -10,7 +10,7 @@ gchar* pantryc_scanner__get_references(GMimeMessage *message);
  * Extract attached file from message
  * @message:		GMimeMessage message want to extract file from
  * @index:			index of MIME part contain file to extract
- * @permission:		specify permission mode to create file (Ex: 644, 755...)
+ * @permission:		specify permission mode to create file (Ex: 0644, 0755...)
  * @filepath:		should be appropriate directory to extract file to, after function call
  * 					name of extracted file would be appended to @filepath
  */
