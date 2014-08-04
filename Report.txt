@@ -80,4 +80,7 @@ Fri 08/01/2014:
 Mon 08/04/2014:
 - Create mail stream at xxfi_connect event instead of xxfi_helo event 
 	... and goddamn "SMFIC_HEADER success" bug has gone away...
-- (process:4194): gmime-CRITICAL **: g_mime_multipart_get_count: assertion `GMIME_IS_MULTIPART (multipart)' failed
+- Fix bug:
+(process:4194): gmime-CRITICAL **: g_mime_multipart_get_count: assertion `GMIME_IS_MULTIPART (multipart)' failed
+Check GMIME_IS_MULTIPART before extract attachments
+- Close "log" and "mail stream" at cleanup and "write message to log file" at xxfi_eom

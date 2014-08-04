@@ -17,8 +17,6 @@ typedef struct pantrycData {
 	int permission; /* attachment permission */
 } pantrycData;
 
-sfsistat pantryc_milter__cleanup(SMFICTX *ctx, bool ok);
-
 sfsistat pantryc_milter__xxfi_connect(SMFICTX *ctx, char *hostname,
 _SOCK_ADDR *hostaddr);
 sfsistat pantryc_milter__xxfi_helo(SMFICTX *ctx, char *helohost);
