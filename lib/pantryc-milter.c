@@ -84,7 +84,7 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	if (data->helofrom != NULL)
 		free(data->helofrom);
 	data->helofrom = buf;
-	printf("%s\n",data->helofrom); // TESTING
+	printf("helo: %s\n",data->helofrom); // TESTING
 	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
 		(void) fclose(data->mail);
 		(void) pantryc_milter__cleanup(ctx, FALSE);
@@ -122,8 +122,8 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 		++argc;
 
 	// TESTING
-	while (*argv++ != NULL)
-		printf("%s\n", *argv);
+	char *mailaddr = smfi_getsymval(ctx, "{mail_addr}");
+	printf("%s\n",mailaddr);
 	////
 
 	/* continue processing */
