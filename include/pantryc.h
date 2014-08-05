@@ -2,7 +2,6 @@
 #define PANTRYC_H_
 
 #include <pantryc-milter.h>
-#include <pantryc-signal.h>
 
 typedef struct smfiDesc pantrycMilter; /* structure mail filter Describe */
 

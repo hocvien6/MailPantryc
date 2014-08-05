@@ -90,24 +90,8 @@ bool pantryc__set_time_out(timeout)
 	return TRUE;
 }
 
-// TESTING
-void catch(int signo) {
-	puts("CATCHED!!!");
-	//exit(EXIT_FAILURE);
-}
 int pantryc__run(argc, argv)
 	int argc;char **argv; {
-	//pantryc_signal__register(PANTRYC_SIGNAL__SIGTERM);
-	// TESTING
-	int i = 0;
-	//for (i = 1; i <= 31; i++) {
-		if (signal(SIGKILL, catch) == SIG_ERR) {
-			printf("An error occurred while setting a signal handler: %d.\n",
-					i);
-			//return EXIT_FAILURE;
-		}
-	//}
-	////
 	if (!setport) {
 		exit(EX_USAGE);
 	}
@@ -116,5 +100,4 @@ int pantryc__run(argc, argv)
 	}
 	return smfi_main();
 }
-////
 /* eof */
