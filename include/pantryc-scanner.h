@@ -6,18 +6,21 @@
  * Get recipients of message
  * @message:		GMimeMessage message to get recipients
  * @type:			type of header: to, cc, or bcc...
+ * return			recipients
  */
 gchar* pantryc_scanner__get_recip(GMimeMessage *message, GMimeRecipientType type);
 
 /**
  * Get date of message
  * @message:		GMimeMessage message to get date
+ * return			date
  */
 gchar* pantryc_scanner__get_date(GMimeMessage *message);
 
 /**
  * Get references of message
  * @message:		GMimeMessage message to get references
+ * return			references
  */
 gchar* pantryc_scanner__get_references(GMimeMessage *message);
 
@@ -28,6 +31,7 @@ gchar* pantryc_scanner__get_references(GMimeMessage *message);
  * @permission:		specify permission mode to create file (Ex: 0644, 0755...)
  * @filepath:		should be appropriate directory to extract file to, after function call
  * 					name of extracted file would be appended to @filepath
+ * return			file stream
  */
 GMimeStream* pantryc_scanner__extract_attachment(GMimeMessage *message,
 		int index, const int permission, const char *filepath);

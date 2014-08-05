@@ -7,16 +7,6 @@
 char *pantryc__working_directory;
 int pantryc__attachment_permission;
 
-typedef struct pantrycData {
-	char *buffer;
-	size_t size;
-	char *connectfrom;
-	char *helofrom;
-	FILE *mail;
-	FILE *log;
-	int permission; /* attachment permission */
-} pantrycData;
-
 /**
  * #Function_in_pantryc_milter_structure
  * Connection info filter

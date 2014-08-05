@@ -20,12 +20,14 @@ void pantryc__change_attachment_permission(const int permission);
 /**
  * Set port for pantryc to connect
  * @port			port to set (ex: f1.sock...)
+ * return			set port successful or not
  */
 bool pantryc__set_port(char *port);
 
 /**
  * Set time out
  * @timeout			time out
+ * return			set time out successful or not
  */
 bool pantryc__set_time_out(char *timeout);
 
