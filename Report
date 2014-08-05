@@ -91,5 +91,5 @@ Tue 08/05/2014:
 	+ pantryc__add_rejected_receipt_address, pantryc__remove_rejected_receipt_address
 		(pantryc)
 - Try to register a signal handler but fail...
-	--> Rool back to stable version before
+	--> Roll back to stable version before
 - Another problem: cannot run program by command line!!!
