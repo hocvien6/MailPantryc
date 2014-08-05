@@ -5,7 +5,7 @@
 void pantryc_list__insert_before(PantrycList *node, void *value);
 void pantryc_list__insert_after(PantrycList *node, void *value);
 
-PantrycList* pantryc_list__new() {
+PantrycList* pantryc_list__new(void) {
 	PantrycList *list;
 	list = (PantrycList*) malloc(sizeof(struct pantrycList));
 	list->next = list;

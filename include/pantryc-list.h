@@ -11,7 +11,7 @@ typedef struct pantrycList {
  * Initialize new pantryc doubly linked list
  * return			new list
  */
-PantrycList* pantryc_list__new();
+PantrycList* pantryc_list__new(void);
 
 /**
  * Insert at the end of the list
@@ -38,6 +38,7 @@ void pantryc_list__delete_node(PantrycList *node);
  * Check whether list is empty
  * return			list is empty or not
  */
+// TODO change return type to bool
 int pantryc_list__is_empty(const PantrycList *list);
 
 /**

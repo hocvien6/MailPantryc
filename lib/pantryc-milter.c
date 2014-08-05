@@ -93,7 +93,10 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 #else /* WIN32 */
 
 #endif /* WIN32 */
+
 	// TESTING, TODO rename log file, #logfullname; change log file mod
+	printf("from: %s\n", smfi_getsymval(ctx, "{mail_addr}"));
+
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *logfullname;
 	logfullname = (char*) malloc(100 * sizeof(char));
@@ -110,6 +113,7 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 		return SMFIS_TEMPFAIL;
 	}
 	////
+
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
@@ -123,7 +127,6 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
-	// TESTING
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}");
 	/* log this recipient */
@@ -142,7 +145,6 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 			}
 		}
 	}
-	////
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -238,7 +240,6 @@ sfsistat pantryc_milter__xxfi_close(ctx)
 	else
 		pantryc_milter__free_pantrycData(data);
 	smfi_setpriv(ctx, NULL);
-
 	g_mime_shutdown();
 	return SMFIS_CONTINUE;
 }

@@ -11,81 +11,81 @@ int pantryc_milter__attachment_permission;
 PantrycList *pantryc_milter__rejected_receipt_addresses;
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Connection info filter
  */
 sfsistat pantryc_milter__xxfi_connect(SMFICTX *ctx, char *hostname,
 _SOCK_ADDR *hostaddr);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * SMTP HELO command filter
  */
 sfsistat pantryc_milter__xxfi_helo(SMFICTX *ctx, char *helohost);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Envelope sender filter
  */
 sfsistat pantryc_milter__xxfi_envfrom(SMFICTX *ctx, char **argv);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Envelope recipient filter
  */
 sfsistat pantryc_milter__xxfi_envrcpt(SMFICTX *ctx, char **argv);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Header filter
  */
 sfsistat pantryc_milter__xxfi_header(SMFICTX *ctx, char *name, char *value);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * End of header
  */
 sfsistat pantryc_milter__xxfi_eoh(SMFICTX *ctxx);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Body block
  */
 sfsistat pantryc_milter__xxfi_body(SMFICTX *ctx, unsigned char *bodyp,
 		size_t bodylen);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * End of message
  */
 sfsistat pantryc_milter__xxfi_eom(SMFICTX *ctx);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Message abort
  */
 sfsistat pantryc_milter__xxfi_abort(SMFICTX *ctx);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Connection cleanup
  */
 sfsistat pantryc_milter__xxfi_close(SMFICTX *ctx);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Any unrecognized or unimplemented command filter
  */
 sfsistat pantryc_milter__xxfi_unknown(SMFICTX *ctx, const char *cmd);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * SMTP DATA command filter
  */
 sfsistat pantryc_milter__xxfi_data(SMFICTX *ctx);
 
 /**
- * #Function_in_pantryc_milter_structure
+ * #Pantryc_milter_structure_function
  * Negotiation callback
  */
 sfsistat pantryc_milter__xxfi_negotiate(SMFICTX *ctx, unsigned long f0,
