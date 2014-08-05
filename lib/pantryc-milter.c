@@ -13,18 +13,18 @@ typedef struct {
 	FILE *mail;
 	FILE *log;
 	int permission; /* attachment permission */
-}*PantrycData;
+} PantrycData;
 
-#define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData) smfi_getpriv(ctx))
+#define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(ctx))
 
 sfsistat pantryc_milter__cleanup(SMFICTX *ctx, bool ok);
-void pantryc_milter__free_pantrycData(PantrycData data);
-void pantryc_milter__write_message_to_log(PantrycData data,
+void pantryc_milter__free_pantrycData(PantrycData *data);
+void pantryc_milter__write_message_to_log(PantrycData *data,
 		GMimeMessage *message);
 
 sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 	SMFICTX *ctx;char *hostname;_SOCK_ADDR *hostaddr; {
-	PantrycData data;
+	PantrycData *data;
 	char *ident;
 	/* allocate some private memory */
 	data = malloc(sizeof *data);
@@ -51,7 +51,7 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	size_t len;
 	char *tls;
 	char *buf;
-	PantrycData data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	tls = smfi_getsymval(ctx, "{tls_version}");
 	if (tls == NULL)
 		tls = "No TLS";
@@ -94,10 +94,10 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 
 #endif /* WIN32 */
 	// TESTING, TODO rename log file, #logfullname; change log file mod
-	PantrycData data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *logfullname;
 	logfullname = (char*) malloc(100 * sizeof(char));
-	strcpy(logfullname, pantryc__working_directory);
+	strcpy(logfullname, pantryc_milter__working_directory);
 	strcat(logfullname, "log.txt");
 	if ((data->log = fopen(logfullname, "w+")) == NULL) {
 		(void) fclose(data->log);
@@ -131,7 +131,8 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 sfsistat pantryc_milter__xxfi_header(ctx, name, value)
 	SMFICTX *ctx;char *name;char *value; {
 	/* write the header to the mail file */
-	if (fprintf(PANTRYC_MILTER__GET_PRIVATE_DATA->mail, "%s: %s\n", name, value) == EOF) {
+	if (fprintf(PANTRYC_MILTER__GET_PRIVATE_DATA->mail, "%s: %s\n", name,
+			value) == EOF) {
 		(void) pantryc_milter__cleanup(ctx, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -152,7 +153,7 @@ sfsistat pantryc_milter__xxfi_eoh(ctx)
 
 sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
-	PantrycData data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	/* output body block to mail file */
 	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
@@ -167,7 +168,7 @@ sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
 
 sfsistat pantryc_milter__xxfi_eom(ctx)
 	SMFICTX *ctx; {
-	PantrycData data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	rewind(data->mail);
 
 	g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
@@ -194,11 +195,11 @@ sfsistat pantryc_milter__xxfi_eom(ctx)
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(
 				(GMimeMultipart*) message->mime_part);
-		data->permission = pantryc__attachment_permission;
+		data->permission = pantryc_milter__attachment_permission;
 		int i;
 		for (i = 0; i <= number_of_parts - 1; i++) {
 			pantryc_scanner__extract_attachment(message, i, data->permission,
-					pantryc__working_directory);
+					pantryc_milter__working_directory);
 		}
 	}
 	return pantryc_milter__cleanup(ctx, TRUE);
@@ -211,7 +212,7 @@ sfsistat pantryc_milter__xxfi_abort(ctx)
 
 sfsistat pantryc_milter__xxfi_close(ctx)
 	SMFICTX *ctx; {
-	PantrycData data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 
 	if (data == NULL)
 		return SMFIS_CONTINUE;
@@ -243,7 +244,7 @@ sfsistat pantryc_milter__xxfi_negotiate(ctx, f0, f1, f2, f3, pf0, pf1, pf2, pf3)
 sfsistat pantryc_milter__cleanup(ctx, ok)
 	SMFICTX *ctx;bool ok; {
 	sfsistat status = SMFIS_CONTINUE;
-	PantrycData data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char host[512];
 	if (data == NULL)
 		return status;
@@ -274,7 +275,7 @@ sfsistat pantryc_milter__cleanup(ctx, ok)
 }
 
 void pantryc_milter__free_pantrycData(data)
-	PantrycData data; {
+	PantrycData *data; {
 	if (data->buffer != NULL)
 		free(data->buffer);
 	if (data->connectfrom != NULL)
@@ -285,7 +286,7 @@ void pantryc_milter__free_pantrycData(data)
 }
 
 void pantryc_milter__write_message_to_log(data, message)
-	PantrycData data;GMimeMessage *message; {
+	PantrycData *data;GMimeMessage *message; {
 	gchar *val;
 	const gchar *str;
 	fprintf(data->log, "From   : %s\n", g_mime_message_get_sender(message));

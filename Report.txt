@@ -84,3 +84,9 @@ Mon 08/04/2014:
 (process:4194): gmime-CRITICAL **: g_mime_multipart_get_count: assertion `GMIME_IS_MULTIPART (multipart)' failed
 Check GMIME_IS_MULTIPART before extract attachments
 - Close "log" and "mail stream" at cleanup and "write message to log file" at xxfi_eom
+
+Tue 08/05/2014:
+- Write pantryc-list: store and handle data with doubly linked list structure
+- Write function:
+	+ pantryc__add_rejected_receipt_address, pantryc__remove_rejected_receipt_address
+		(pantryc)

@@ -6,6 +6,18 @@
 typedef struct smfiDesc pantrycMilter; /* structure mail filter Describe */
 
 /**
+ * Add address to rejected recipients list
+ * @address			rejected address to add
+ */
+void pantryc__add_rejected_receipt_address(char *address);
+
+/**
+ * Remove address to rejected recipients list
+ * @address			rejected address to remove
+ */
+void pantryc__remove_rejected_receipt_address(char *address);
+
+/**
  * Change working directory of pantryc milter
  * @directory		where extract attachments and store log file for each message
  */
