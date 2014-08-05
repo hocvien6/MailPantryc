@@ -119,11 +119,30 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 
 sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 	SMFICTX *ctx;char **argv; {
-	//char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}"); // TESTING
 	int argc = 0;
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
+	// TESTING
+	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
+	char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}");
+	/* log this recipient */
+	if (!PANTRYC_LIST__IS_NULL(
+			pantryc_milter__rejected_receipt_addresses) && rcptaddr != NULL) {
+		PantrycList *seeker;
+		PANTRYC_LIST__TRAVERSE(seeker, pantryc_milter__rejected_receipt_addresses)
+		{
+			if (strcasecmp(rcptaddr, (char*) pantryc_list__get_value(seeker))
+					== 0) {
+				if (fprintf(data->log, "RCPT %s -- REJECTED\n", rcptaddr) == EOF) {
+					(void) pantryc_milter__cleanup(ctx, FALSE);
+					return SMFIS_TEMPFAIL;
+				}
+				return SMFIS_REJECT;
+			}
+		}
+	}
+	////
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
