@@ -15,15 +15,15 @@ typedef struct {
 	int permission; /* attachment permission */
 } PantrycData;
 
-#define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(ctx))
+#define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(context))
 
-sfsistat pantryc_milter__cleanup(SMFICTX *ctx, bool ok);
+sfsistat pantryc_milter__cleanup(SMFICTX *context, bool ok);
 void pantryc_milter__free_pantrycData(PantrycData *data);
 void pantryc_milter__write_message_to_log(PantrycData *data,
 		GMimeMessage *message);
 
-sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
-	SMFICTX *ctx;char *hostname;_SOCK_ADDR *hostaddr; {
+sfsistat pantryc_milter__xxfi_connect(context, hostname, hostaddr)
+	SMFICTX *context;char *hostname;_SOCK_ADDR *hostaddr; {
 	PantrycData *data;
 	char *ident;
 	/* allocate some private memory */
@@ -34,32 +34,32 @@ sfsistat pantryc_milter__xxfi_connect(ctx, hostname, hostaddr)
 	}
 	memset(data, '\0', sizeof *data);
 	/* save the private data */
-	smfi_setpriv(ctx, data);
-	ident = smfi_getsymval(ctx, "_");
+	smfi_setpriv(context, data);
+	ident = smfi_getsymval(context, "_");
 	if (ident == NULL)
 		ident = "???";
 	if ((data->connectfrom = strdup(ident)) == NULL) {
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
-	SMFICTX *ctx;char *helohost; {
+sfsistat pantryc_milter__xxfi_helo(context, helohost)
+	SMFICTX *context;char *helohost; {
 	size_t len;
 	char *tls;
 	char *buf;
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
-	tls = smfi_getsymval(ctx, "{tls_version}");
+	tls = smfi_getsymval(context, "{tls_version}");
 	if (tls == NULL)
 		tls = "No TLS";
 	if (helohost == NULL)
 		helohost = "???";
 	len = strlen(tls) + strlen(helohost) + 3;
 	if ((buf = (char*) malloc(len)) == NULL) {
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	snprintf(buf, len, "%s, %s", helohost, tls);
@@ -70,8 +70,8 @@ sfsistat pantryc_milter__xxfi_helo(ctx, helohost)
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
-	SMFICTX *ctx;char **argv; {
+sfsistat pantryc_milter__xxfi_envfrom(context, argv)
+	SMFICTX *context;char **argv; {
 	int argc = 0;
 
 #ifdef WIN32
@@ -82,12 +82,12 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	if (GetTempPath(MAX_PATH, szFilename) == 0)
 	{
 		/* This shouldn't fail */
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	if ((data->pantryc_fname = strdup(_tempnam(szFilename, "msgPantryc."))) == NULL)
 	{
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 #else /* WIN32 */
@@ -95,7 +95,7 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 #endif /* WIN32 */
 
 	// TESTING, TODO rename log file, #logfullname; change log file mod
-	printf("from: %s\n", smfi_getsymval(ctx, "{mail_addr}"));
+	printf("from: %s\n", smfi_getsymval(context, "{mail_addr}"));
 
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *logfullname;
@@ -104,12 +104,12 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	strcat(logfullname, "log.txt");
 	if ((data->log = fopen(logfullname, "w+")) == NULL) {
 		(void) fclose(data->log);
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
 		(void) fclose(data->mail);
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	////
@@ -121,14 +121,14 @@ sfsistat pantryc_milter__xxfi_envfrom(ctx, argv)
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
-	SMFICTX *ctx;char **argv; {
+sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
+	SMFICTX *context;char **argv; {
 	int argc = 0;
 	/* count the arguments */
 	while (*argv++ != NULL)
 		++argc;
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
-	char *rcptaddr = smfi_getsymval(ctx, "{rcpt_addr}");
+	char *rcptaddr = smfi_getsymval(context, "{rcpt_addr}");
 	/* log this recipient */
 	if (!PANTRYC_LIST__IS_NULL(
 			pantryc_milter__rejected_receipt_addresses) && rcptaddr != NULL) {
@@ -138,7 +138,7 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 			if (strcasecmp(rcptaddr, (char*) pantryc_list__get_value(seeker))
 					== 0) {
 				if (fprintf(data->log, "RCPT %s -- REJECTED\n", rcptaddr) == EOF) {
-					(void) pantryc_milter__cleanup(ctx, FALSE);
+					(void) pantryc_milter__cleanup(context, FALSE);
 					return SMFIS_TEMPFAIL;
 				}
 				return SMFIS_REJECT;
@@ -149,46 +149,46 @@ sfsistat pantryc_milter__xxfi_envrcpt(ctx, argv)
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_header(ctx, name, value)
-	SMFICTX *ctx;char *name;char *value; {
+sfsistat pantryc_milter__xxfi_header(context, name, value)
+	SMFICTX *context;char *name;char *value; {
 	/* write the header to the mail file */
 	if (fprintf(PANTRYC_MILTER__GET_PRIVATE_DATA->mail, "%s: %s\n", name,
 			value) == EOF) {
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_eoh(ctx)
-	SMFICTX *ctx; {
+sfsistat pantryc_milter__xxfi_eoh(context)
+	SMFICTX *context; {
 	/* output the blank line between the header and the body */
 	if (fprintf(PANTRYC_MILTER__GET_PRIVATE_DATA->mail, "\n") == EOF) {
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_body(ctx, bodyp, bodylen)
-	SMFICTX *ctx;unsigned char *bodyp;size_t bodylen; {
+sfsistat pantryc_milter__xxfi_body(context, bodyp, bodylen)
+	SMFICTX *context;unsigned char *bodyp;size_t bodylen; {
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	/* output body block to mail file */
 	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
 		fprintf(data->log, "Couldn't write file (error: %s)\n",
 				strerror(errno));
-		(void) pantryc_milter__cleanup(ctx, FALSE);
+		(void) pantryc_milter__cleanup(context, FALSE);
 		return SMFIS_TEMPFAIL;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_eom(ctx)
-	SMFICTX *ctx; {
+sfsistat pantryc_milter__xxfi_eom(context)
+	SMFICTX *context; {
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	rewind(data->mail);
 
@@ -223,46 +223,49 @@ sfsistat pantryc_milter__xxfi_eom(ctx)
 					pantryc_milter__working_directory);
 		}
 	}
-	return pantryc_milter__cleanup(ctx, TRUE);
+
+	smfi_quarantine(context, "delay"); // TESTING
+	return pantryc_milter__cleanup(context, TRUE);
 }
 
-sfsistat pantryc_milter__xxfi_abort(ctx)
-	SMFICTX *ctx; {
-	return pantryc_milter__cleanup(ctx, FALSE);
+sfsistat pantryc_milter__xxfi_abort(context)
+	SMFICTX *context; {
+	return pantryc_milter__cleanup(context, FALSE);
 }
 
-sfsistat pantryc_milter__xxfi_close(ctx)
-	SMFICTX *ctx; {
+sfsistat pantryc_milter__xxfi_close(context)
+	SMFICTX *context; {
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 
 	if (data == NULL)
 		return SMFIS_CONTINUE;
 	else
 		pantryc_milter__free_pantrycData(data);
-	smfi_setpriv(ctx, NULL);
+	smfi_setpriv(context, NULL);
 	g_mime_shutdown();
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_unknown(ctx, cmd)
-	SMFICTX *ctx;const char *cmd; {
+sfsistat pantryc_milter__xxfi_unknown(context, command)
+	SMFICTX *context;const char *command; {
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_data(ctx)
-	SMFICTX *ctx; {
+sfsistat pantryc_milter__xxfi_data(context)
+	SMFICTX *context; {
 	return SMFIS_CONTINUE;
 }
 
-sfsistat pantryc_milter__xxfi_negotiate(ctx, f0, f1, f2, f3, pf0, pf1, pf2, pf3)
-	SMFICTX *ctx;unsigned long f0;unsigned long f1;unsigned long f2;unsigned long f3;unsigned long *pf0;unsigned long *pf1;unsigned long *pf2;unsigned long *pf3; {
+sfsistat pantryc_milter__xxfi_negotiate(context, f0, f1, f2, f3, pf0, pf1, pf2,
+		pf3)
+	SMFICTX *context;unsigned long f0;unsigned long f1;unsigned long f2;unsigned long f3;unsigned long *pf0;unsigned long *pf1;unsigned long *pf2;unsigned long *pf3; {
 	return SMFIS_ALL_OPTS;
 }
 
 /* Private functions */
 
-sfsistat pantryc_milter__cleanup(ctx, ok)
-	SMFICTX *ctx;bool ok; {
+sfsistat pantryc_milter__cleanup(context, ok)
+	SMFICTX *context;bool ok; {
 	sfsistat status = SMFIS_CONTINUE;
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char host[512];

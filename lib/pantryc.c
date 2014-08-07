@@ -9,7 +9,7 @@ bool setport = FALSE;
 
 pantrycMilter milter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
-SMFIF_ADDHDRS | SMFIF_ADDRCPT,
+SMFIF_ADDHDRS | SMFIF_ADDRCPT | SMFIF_QUARANTINE, // TESTING
 /* flags */
 pantryc_milter__xxfi_connect, /* connection info filter */
 pantryc_milter__xxfi_helo, /* SMTP HELO command filter */
@@ -82,7 +82,7 @@ bool pantryc__set_port(port)
 	return setport;
 }
 
-bool pantryc__set_time_out(timeout)
+bool pantryc__set_timeout(timeout)
 	char *timeout; {
 	if (smfi_settimeout(atoi(timeout)) == MI_FAILURE) {
 		return FALSE;

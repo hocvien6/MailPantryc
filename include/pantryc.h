@@ -41,7 +41,7 @@ bool pantryc__set_port(char *port);
  * @timeout			time out
  * return			set time out successful or not
  */
-bool pantryc__set_time_out(char *timeout);
+bool pantryc__set_timeout(char *timeout);
 
 /**
  * Pantryc milter start
