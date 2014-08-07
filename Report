@@ -93,3 +93,6 @@ Tue 08/05/2014:
 - Try to register a signal handler but fail...
 	--> Roll back to stable version before
 - Another problem: cannot run program by command line!!!
+
+Thu 08/07/2014:
+... Stalk ...
