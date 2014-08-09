@@ -17,7 +17,6 @@ PantrycList* pantryc_list__new(void);
  * Insert at the end of the list
  * @list:			list which to append node
  * @value:			value want to insert
- * return			new pantryc doubly linked list
  */
 void pantryc_list__append(PantrycList *list, void *value);
 

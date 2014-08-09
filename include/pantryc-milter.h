@@ -45,7 +45,7 @@ sfsistat pantryc_milter__xxfi_header(SMFICTX *context, char *name, char *value);
  * #Pantryc_milter_structure_function
  * End of header
  */
-sfsistat pantryc_milter__xxfi_eoh(SMFICTX *contextx);
+sfsistat pantryc_milter__xxfi_eoh(SMFICTX *context);
 
 /**
  * #Pantryc_milter_structure_function
