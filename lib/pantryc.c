@@ -9,7 +9,7 @@ bool setport = FALSE;
 
 pantrycMilter milter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
-SMFIF_ADDHDRS | SMFIF_ADDRCPT, // TESTING
+SMFIF_ADDHDRS | SMFIF_ADDRCPT,
 		/* flags */
 		pantryc_milter__xxfi_connect, /* connection info filter */
 		pantryc_milter__xxfi_helo, /* SMTP HELO command filter */
