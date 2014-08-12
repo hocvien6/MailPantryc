@@ -224,7 +224,6 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		}
 	}
 
-	smfi_quarantine(context, "delay"); // TESTING
 	return pantryc_milter__cleanup(context, TRUE);
 }
 
