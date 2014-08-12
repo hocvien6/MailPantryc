@@ -27,7 +27,7 @@ Mon 07/21/2014:
 - Create account at Vbox
 
 Tue 07/22/2014:
-- Use zlib library to read and decompress gzip file
+- Use zlib library to read and uncompress gzip file
 - Base64: how to encode and decode
 - MIME::Decoder (CPAN - Perl module): create new project for testing
 
@@ -60,7 +60,7 @@ Wed 07/30/2014:
 	+ pantryc_scanner_extract_attachment
 		(pantryc-scanner)
 - Read about Object-Orientation in C:
-Refrence:
+Reference:
 http://stackoverflow.com/questions/1237266/how-can-inheritance-be-modelled-using-c
 http://stackoverflow.com/questions/415452/object-orientation-in-c
 
@@ -99,4 +99,10 @@ Thu 08/07/2014:
 
 ========== WEEK 7 ==========
 Tue 08/12/2014:
+- Learn how to program with pipe
+Reference:
+	http://crasseux.com/books/ctutorial/Programming-with-pipes.html
+- Use `time <script or program>' command line to calculate execution time:
+Ex:
+$ time ./SendSimultaneousMail		# SendSimultaneousMail: C program use pipes to send mail
 ... Stalk ...
