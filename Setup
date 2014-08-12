@@ -1,8 +1,9 @@
 pantryc
+
 ==============
 DO THESE FIRST
 
-1. Add C/C++ IDE (CDT) plugin
+1. Install C/C++ IDE (CDT) plugin
 http://download.eclipse.org/tools/cdt/releases/8.4
 
 2. Use libmilter to compile a filter
@@ -27,7 +28,11 @@ b.
 - Add library "gmime-2.6"								# NO LONGER NEEDED
 - Add Include path: "/usr/include/gmime-2.6"
 
-6. Add own Include path to project
+6. Setting up and using sqlite3
+# apt-get install libsqlite3-dev
+- Add library "sqlite3"
+
+7. Add own Include path to project
 "${workspace_loc:/${ProjName}/include}"
 
 ========================
@@ -179,6 +184,7 @@ $ pkg-config --libs <lib package>
 # postsuper -d <mail ID>
 - Delete all queued mails from the mailq
 # postsuper -d ALL
+
 =============
 DOCUMENTATION
 1. Glib
@@ -186,6 +192,9 @@ https://developer.gnome.org/glib/
 2. Zlib
 http://www.lemoda.net/c/zlib-open-read/
 https://github.com/kripken/emscripten/issues/124
+3. Sqlite3
+Tutorial:
+http://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm 
 
 ========
 REMEMBER
