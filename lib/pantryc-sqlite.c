@@ -41,6 +41,14 @@ void pantryc_sqlite__add_rejected_receipt_address(address)
 	}
 }
 
+int callback(void *data, int size, char **value, char **column) {
+	PantrycList *l = (PantrycList*) data;
+	printf("value: %p\n", l->next); // TESTING
+	printf("value: %p %s\n", &value[0], value[0]); // TESTING
+	pantryc_list__append((PantrycList*) data, value[0] ? strdup(value[0]) : NULL);
+	return 0;
+}
+
 PantrycList* pantryc_sqlite__get_rejected_receipt_address_list() {
 	PantrycList *list = pantryc_list__new();
 	char *sql = (char*) malloc(sizeof(char) * PANTRYC_SQLITE__SQL_LENGTH);
@@ -48,15 +56,8 @@ PantrycList* pantryc_sqlite__get_rejected_receipt_address_list() {
 	" from " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS ";");
 
 	char *error;
-	int result =
-			sqlite3_exec(pantryc_sqlite__database, sql,
-					( {	int $(void *data, int size, char **value, char **column) {
-									PantrycList *l = (PantrycList*)data;
-									printf("value: %p\n",l->next); // TESTING
-									printf("value: %p %s\n",&value[0],value[0]); // TESTING
-									pantryc_list__append((PantrycList*)data,value[0] ? value[0] : NULL);
-									return 0;}$;}), (PantrycList*) list,
-					&error);
+	int result = sqlite3_exec(pantryc_sqlite__database, sql, callback,
+			(void*) list, &error);
 	// TESTING
 	PantrycList *seek;
 	PANTRYC_LIST__TRAVERSE(seek, list)
