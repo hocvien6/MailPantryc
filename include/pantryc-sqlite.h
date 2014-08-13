@@ -3,6 +3,8 @@
 
 #include <sqlite3.h>
 
+#include <pantryc-global.h>
+
 #define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
 #define PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS			"RejectedReceiptAddress"
 #define PANTRYC_SQLITE__COLUMN_ADDRESS							"Address"
@@ -21,6 +23,12 @@ void pantryc__open_database();
  * @database:		pantryc database
  */
 void pantryc_sqlite__add_rejected_receipt_address(char *address);
+
+/**
+ * Get rejected receipt address list
+ * return			list of rejected receipt addresses
+ */
+PantrycList* pantryc_sqlite__get_rejected_receipt_address_list();
 
 /**
  * Close database

@@ -1,13 +1,19 @@
 #include <string.h>
+#include <stdlib.h>
 
 #include "../include/pantryc-sqlite.h"
 
 static void pantryc_sqlite__initialize(char *column);
 
 void pantryc__open_database() {
-	char *message = 0;
 	int result;
-	result = sqlite3_open(PANTRYC_SQLITE__DATABASE, &pantryc_sqlite__database);
+	char *filename = (char*) malloc(
+			sizeof(char)
+					* (strlen(pantryc_global__working_directory)
+							+ strlen(PANTRYC_SQLITE__DATABASE) + 1));
+	strcpy(filename, pantryc_global__working_directory);
+	strcat(filename, PANTRYC_SQLITE__DATABASE);
+	result = sqlite3_open(filename, &pantryc_sqlite__database);
 
 	if (result) {
 		pantryc_sqlite__database = NULL;
@@ -26,6 +32,22 @@ void pantryc_sqlite__add_rejected_receipt_address(address)
 
 	char *message;
 	sqlite3_exec(pantryc_sqlite__database, sql, NULL, NULL, &message);
+}
+
+PantrycList* pantryc_sqlite__get_rejected_receipt_address_list() {
+	PantrycList *list = pantryc_list__new();
+	pantryc_sqlite__initialize( PANTRYC_SQLITE__COLUMN_ADDRESS);
+	char *sql;
+	sql = "select " PANTRYC_SQLITE__COLUMN_ADDRESS
+	" from " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS;
+
+	char *message;
+	int result = sqlite3_exec(pantryc_sqlite__database, sql, NULL, list,
+			&message);
+	if (result != SQLITE_OK) {
+		return NULL;
+	}
+	return list;
 }
 
 int pantryc_sqlite__close() {
