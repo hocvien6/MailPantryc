@@ -4,9 +4,7 @@
 #include <libmilter/mfapi.h>
 
 #include <pantryc-scanner.h>
-
-char *pantryc_milter__working_directory;
-int pantryc_milter__attachment_permission;
+#include <pantryc-global.h>
 
 /**
  * #Pantryc_milter_structure_function

@@ -7,18 +7,6 @@
 typedef struct smfiDesc pantrycMilter; /* structure mail filter Describe */
 
 /**
- * Change working directory of pantryc milter
- * @directory:		where extract attachments and store log file for each message
- */
-void pantryc__change_working_directory(const char *directory);
-
-/**
- * Change permission of extracted attachment
- * @permission:		mode of permission (ex: 0644, 0755...)
- */
-void pantryc__change_attachment_permission(const int permission);
-
-/**
  * Set port for pantryc to connect
  * @port:			port to set (ex: f1.sock...)
  * return			set port successful or not
