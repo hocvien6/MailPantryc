@@ -7,7 +7,7 @@
 
 static void pantryc_sqlite__initialize(char *column);
 
-void pantryc__open_database() {
+void pantryc_sqlite__open_database() {
 	int result;
 	char *filename = (char*) malloc(
 			sizeof(char)

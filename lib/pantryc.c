@@ -26,16 +26,6 @@ pantryc_milter__xxfi_data, /* DATA command */
 pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 };
 
-void pantryc__add_rejected_receipt_address(address)
-	char * address; {
-	pantryc_sqlite__add_rejected_receipt_address(address);
-}
-
-void pantryc__remove_rejected_receipt_address(address)
-	char * address; {
-	pantryc_sqlite__remove_rejected_receipt_address(address);
-}
-
 bool pantryc__set_port(port)
 	char *port; {
 

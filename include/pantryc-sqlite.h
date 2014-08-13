@@ -15,7 +15,7 @@ sqlite3 *pantryc_sqlite__database;
 /**
  * Open Pantryc Database
  */
-void pantryc__open_database();
+void pantryc_sqlite__open_database();
 
 /**
  * Add an address to rejected recipients list
