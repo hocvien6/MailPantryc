@@ -99,7 +99,7 @@ sfsistat pantryc_milter__xxfi_envfrom(context, argv)
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *logfullname;
 	logfullname = (char*) malloc(100 * sizeof(char));
-	strcpy(logfullname, pantryc_milter__working_directory);
+	strcpy(logfullname, pantryc_global__working_directory);
 	strcat(logfullname, "log.txt");
 	if ((data->log = fopen(logfullname, "w+")) == NULL) {
 		(void) fclose(data->log);
@@ -129,7 +129,10 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *rcptaddr = smfi_getsymval(context, "{rcpt_addr}");
 	/* log this recipient */
-	/* TODO
+	if (!PANTRYC_LIST__IS_NULL(
+			pantryc_global__rejected_receipt_addresses) && rcptaddr != NULL) {
+		PantrycList *seeker;
+		PANTRYC_LIST__TRAVERSE(seeker, pantryc_global__rejected_receipt_addresses)
 		{
 			if (strcasecmp(rcptaddr, (char*) pantryc_list__get_value(seeker))
 					== 0) {
@@ -141,7 +144,6 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 			}
 		}
 	}
-	*/
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -216,8 +218,8 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		int i;
 		for (i = 0; i <= number_of_parts - 1; i++) {
 			pantryc_scanner__extract_attachment(message, i,
-					pantryc_milter__attachment_permission,
-					pantryc_milter__working_directory);
+					pantryc_global__attachment_permission,
+					pantryc_global__working_directory);
 		}
 	}
 

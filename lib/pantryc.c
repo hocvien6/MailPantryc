@@ -56,6 +56,7 @@ bool pantryc__set_timeout(timeout)
 
 int pantryc__run(argc, argv)
 	int argc;char **argv; {
+	pantryc__open_database();
 	if (!setport) {
 		exit(EX_USAGE);
 	}
@@ -63,5 +64,9 @@ int pantryc__run(argc, argv)
 		exit(EX_UNAVAILABLE);
 	}
 	return smfi_main();
+}
+
+int pantryc__quit() {
+	return pantryc_sqlite__close();
 }
 /* eof */

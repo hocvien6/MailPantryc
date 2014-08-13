@@ -27,4 +27,10 @@ bool pantryc__set_timeout(char *timeout);
  */
 int pantryc__run(int argc, char **argv);
 
+/**
+ * Pantryc milter quit
+ * return
+ */
+int pantryc__quit();
+
 #endif /* PANTRYC_H_ */

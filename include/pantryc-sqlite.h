@@ -25,6 +25,6 @@ void pantryc_sqlite__add_rejected_receipt_address(char *address);
 /**
  * Close database
  */
-void pantryc_sqlite__close();
+int pantryc_sqlite__close();
 
 #endif /* PANTRYC_SQLITE_H_ */

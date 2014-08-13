@@ -28,8 +28,8 @@ void pantryc_sqlite__add_rejected_receipt_address(address)
 	sqlite3_exec(pantryc_sqlite__database, sql, NULL, NULL, &message);
 }
 
-void pantryc_sqlite__close() {
-	sqlite3_close(pantryc_sqlite__database);
+int pantryc_sqlite__close() {
+	return sqlite3_close(pantryc_sqlite__database);
 }
 
 /* Private function */
