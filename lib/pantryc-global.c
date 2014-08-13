@@ -17,3 +17,13 @@ void pantryc_global__change_attachment_permission(permission)
 	const int permission; {
 	pantryc_global__attachment_permission = permission;
 }
+
+void pantryc_global__create_log_file() {
+	char *filename = (char*) malloc(
+			sizeof(char)
+					* (strlen(pantryc_global__working_directory)
+							+ strlen(PANTRYC_GLOBAL__LOG_FILE) + 1));
+	strcpy(filename, pantryc_global__working_directory);
+	strcat(filename, PANTRYC_GLOBAL__LOG_FILE);
+	pantryc_global__log_file = fopen(filename, "w+");
+}
