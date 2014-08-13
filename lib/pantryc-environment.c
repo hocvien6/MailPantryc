@@ -3,7 +3,7 @@
 #include <sysexits.h>
 #include <libmilter/mfapi.h>
 
-#include "../include/pantryc.h"
+#include "../include/pantryc-environment.h"
 
 bool setport = FALSE;
 
@@ -26,7 +26,7 @@ pantryc_milter__xxfi_data, /* DATA command */
 pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 };
 
-bool pantryc__set_port(port)
+bool pantryc_environment__set_port(port)
 	char *port; {
 
 	if (smfi_setconn(port) == MI_FAILURE) {
@@ -46,7 +46,7 @@ bool pantryc__set_port(port)
 	return setport;
 }
 
-bool pantryc__set_timeout(timeout)
+bool pantryc_environment__set_timeout(timeout)
 	char *timeout; {
 	if (smfi_settimeout(atoi(timeout)) == MI_FAILURE) {
 		return FALSE;
@@ -54,7 +54,7 @@ bool pantryc__set_timeout(timeout)
 	return TRUE;
 }
 
-int pantryc__run(argc, argv)
+int pantryc_environment__run(argc, argv)
 	int argc;char **argv; {
 	if (!setport) {
 		exit(EX_USAGE);
@@ -66,7 +66,7 @@ int pantryc__run(argc, argv)
 	return smfi_main();
 }
 
-int pantryc__quit() {
+int pantryc_environment__quit() {
 	return pantryc_sqlite__close();
 }
 /* eof */
