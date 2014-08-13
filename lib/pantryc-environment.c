@@ -67,6 +67,7 @@ int pantryc_environment__run(argc, argv)
 }
 
 int pantryc_environment__quit() {
-	return pantryc_sqlite__close();
+	return sqlite3_close(pantryc_sqlite__database)
+			&& fclose(pantryc_global__log_file);
 }
 /* eof */

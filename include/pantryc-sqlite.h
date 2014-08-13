@@ -8,6 +8,7 @@
 #define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
 #define PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS			"RejectedReceiptAddress"
 #define PANTRYC_SQLITE__COLUMN_ADDRESS							"Address"
+
 #define PANTRYC_SQLITE__TEXT_LENGTH								"50"
 
 sqlite3 *pantryc_sqlite__database;
@@ -34,10 +35,5 @@ void pantryc_sqlite__remove_rejected_receipt_address(char *address);
  * return			list of rejected receipt addresses
  */
 PantrycList* pantryc_sqlite__get_rejected_receipt_address_list();
-
-/**
- * Close database
- */
-int pantryc_sqlite__close();
 
 #endif /* PANTRYC_SQLITE_H_ */
