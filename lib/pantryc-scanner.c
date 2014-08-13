@@ -35,7 +35,7 @@ gchar* pantryc_scanner__get_date(message)
 
 	if (length > 0) {
 		gchar *date = (gchar*) malloc(72 * sizeof(gchar));
-		sprintf(date, "%s (%s%04d)\n", buf, timezone < 0 ? "-" : "+", timezone);
+		sprintf(date, "%s (%s%04d)", buf, timezone < 0 ? "-" : "+", timezone);
 		return date;
 	}
 	return NULL;
@@ -66,10 +66,26 @@ gchar* pantryc_scanner__get_references(message)
 	return references;
 }
 
+gchar* pantryc_scanner__get_content(message, index)
+	GMimeMessage *message;int index; {
+	GMimeMultipart *parts = (GMimeMultipart*) message->mime_part;
+	GMimeObject *object = g_mime_multipart_get_part(parts, index);
+	GMimePart *part = (GMimePart*) object;
+	GMimeStream *stream = g_mime_data_wrapper_get_stream(
+			g_mime_part_get_content_object(part));
+	gint64 length = g_mime_stream_length(stream);
+	gchar *content = (gchar*) malloc(sizeof(gchar) * (length + 1));
+	g_mime_stream_read(stream, content, length);
+
+	// TODO cut off the tail, modify appropriate index of the last character
+	content[length - 2] = '\0';
+
+	return content;
+}
+
 GMimeStream* pantryc_scanner__extract_attachment(message, index, permission,
 		filepath)
 	GMimeMessage *message;int index;const int permission;const char *filepath; {
-
 	GMimeMultipart *parts = (GMimeMultipart*) message->mime_part;
 	GMimeObject *object = g_mime_multipart_get_part(parts, index);
 
@@ -95,4 +111,33 @@ GMimeStream* pantryc_scanner__extract_attachment(message, index, permission,
 	g_mime_data_wrapper_write_to_stream(data, stream);
 
 	return stream;
+}
+
+FILE* pantryc_scanner__read_attachment(message, index)
+	GMimeMessage *message;int index; {
+	GMimeMultipart *parts = (GMimeMultipart*) message->mime_part;
+	GMimeObject *object = g_mime_multipart_get_part(parts, index);
+
+	if (!GMIME_IS_CONTENT_DISPOSITION(
+			g_mime_object_get_content_disposition(object))
+			|| strcmp(
+					g_mime_content_disposition_get_disposition(
+							g_mime_object_get_content_disposition(object)),
+					(char*) GMIME_DISPOSITION_ATTACHMENT) != 0)
+		return NULL;
+
+	GMimePart *part = (GMimePart*) object;
+	GMimeStream *stream = g_mime_data_wrapper_get_stream(
+			g_mime_part_get_content_object(part));
+	gint64 length = g_mime_stream_length(stream);
+	char *content = (char*) malloc(sizeof(char) * length);
+	g_mime_stream_read(stream, content, length);
+
+	char *buffer;
+	size_t size;
+	FILE *file = open_memstream(&buffer, &size);
+
+	// TODO: write content to file stream
+
+	return file;
 }

@@ -8,7 +8,8 @@
  * @type:			type of header: to, cc, or bcc...
  * return			recipients
  */
-gchar* pantryc_scanner__get_recip(GMimeMessage *message, GMimeRecipientType type);
+gchar* pantryc_scanner__get_recip(GMimeMessage *message,
+		GMimeRecipientType type);
 
 /**
  * Get date of message
@@ -25,7 +26,15 @@ gchar* pantryc_scanner__get_date(GMimeMessage *message);
 gchar* pantryc_scanner__get_references(GMimeMessage *message);
 
 /**
- * Extract attached file from message
+ * Get message content of message
+ * @message:		GMimeMessage message to read message content
+ * @index:			index of MIME part to get content
+ * return			message content
+ */
+gchar* pantryc_scanner__get_content(GMimeMessage *message, int index);
+
+/**
+ * Extract attached file from a MIME part
  * @message:		GMimeMessage message that want to extract file from
  * @index:			index of MIME part contain file to extract
  * @permission:		specify permission mode to create file (Ex: 0644, 0755...)
@@ -35,5 +44,13 @@ gchar* pantryc_scanner__get_references(GMimeMessage *message);
  */
 GMimeStream* pantryc_scanner__extract_attachment(GMimeMessage *message,
 		int index, const int permission, const char *filepath);
+
+/**
+ * Read data from certain MIME part and write to file stream
+ * @message:		GMimeMessage message that want to get file stream data
+ * @index:			index of MIME part contain file to get
+ * return			file stream get from MIME part
+ */
+FILE* pantryc_scanner__read_attachment(GMimeMessage *message, int index);
 
 #endif /* PANTRYC_SCANNER_H_ */

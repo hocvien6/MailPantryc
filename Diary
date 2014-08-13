@@ -106,3 +106,10 @@ Reference:
 Ex:
 $ time ./SendSimultaneousMail		# SendSimultaneousMail: C program use pipes to send mail
 ... Stalk ...
+
+Wed 08/13/2014:
+- Read content of each mime part
+	(use g_mime_stream_write function)
+- Write function:
+	+ pantryc_scanner__get_content // TODO, pantryc_scanner__read_attachment // TODO
+		(pantryc_scanner)

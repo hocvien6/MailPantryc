@@ -311,31 +311,34 @@ void pantryc_milter__write_message_to_log(data, message)
 	PantrycData *data;GMimeMessage *message; {
 	gchar *val;
 	const gchar *str;
-	fprintf(data->log, "From   : %s\n", g_mime_message_get_sender(message));
+	fprintf(data->log, "From:		%s\n", g_mime_message_get_sender(message));
 
 	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_TO);
-	fprintf(data->log, "To     : %s\n", val ? val : "<none>");
+	fprintf(data->log, "To:			%s\n", val ? val : "<none>");
 	g_free(val);
 
 	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_CC);
-	fprintf(data->log, "Cc     : %s\n", val ? val : "<none>");
+	fprintf(data->log, "Cc:			%s\n", val ? val : "<none>");
 	g_free(val);
 
 	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_BCC);
-	fprintf(data->log, "Bcc    : %s\n", val ? val : "<none>");
+	fprintf(data->log, "Bcc:		%s\n", val ? val : "<none>");
 	g_free(val);
 
 	str = g_mime_message_get_subject(message);
-	fprintf(data->log, "Subject: %s\n", str ? str : "<none>");
+	fprintf(data->log, "Subject:	%s\n", str ? str : "<none>");
 
 	val = pantryc_scanner__get_date(message);
-	fprintf(data->log, "Date   : %s\n", val);
+	fprintf(data->log, "Date:		%s\n", val);
+
+	val = pantryc_scanner__get_content(message, 0);
+	fprintf(data->log, "Message:	\"%s\"\n", val);
 
 	str = g_mime_message_get_message_id(message);
-	fprintf(data->log, "Msg-id : %s\n", str ? str : "<none>");
+	fprintf(data->log, "Msg-id:		%s\n", str ? str : "<none>");
 
 	gchar *refsstr;
 	refsstr = pantryc_scanner__get_references(message);
-	fprintf(data->log, "Refs   : %s\n", refsstr ? refsstr : "<none>");
+	fprintf(data->log, "Refs:		%s\n", refsstr ? refsstr : "<none>");
 	g_free(refsstr);
 }
