@@ -129,10 +129,10 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *rcptaddr = smfi_getsymval(context, "{rcpt_addr}");
 	/* log this recipient */
-	if (!PANTRYC_LIST__IS_NULL(
-			pantryc_global__rejected_receipt_addresses) && rcptaddr != NULL) {
+	PantrycList *list = pantryc_sqlite__get_rejected_receipt_address_list();
+	if (!PANTRYC_LIST__IS_NULL(list) && rcptaddr != NULL) {
 		PantrycList *seeker;
-		PANTRYC_LIST__TRAVERSE(seeker, pantryc_global__rejected_receipt_addresses)
+		PANTRYC_LIST__TRAVERSE(seeker, list)
 		{
 			if (strcasecmp(rcptaddr, (char*) pantryc_list__get_value(seeker))
 					== 0) {

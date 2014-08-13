@@ -5,7 +5,6 @@
 
 char *pantryc_global__working_directory;
 int pantryc_global__attachment_permission;
-PantrycList *pantryc_global__rejected_receipt_addresses;
 
 /**
  * Change working directory of pantryc milter

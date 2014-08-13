@@ -116,3 +116,5 @@ Wed 08/13/2014:
 - Template, Container and Lambda expression in C... WOW!!!
 Reference:
 http://byteworm.com/2010/10/12/container/
+- Write pantryc-sqlite: integrate to sqlite database management
+- Create and store some variable at pantryc-global

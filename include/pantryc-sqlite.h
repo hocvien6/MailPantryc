@@ -20,9 +20,14 @@ void pantryc__open_database();
 /**
  * Add an address to rejected recipients list
  * @address:		rejected address to add
- * @database:		pantryc database
  */
 void pantryc_sqlite__add_rejected_receipt_address(char *address);
+
+/**
+ * Remove an address from rejected recipients list
+ * @address:		rejected address to remove
+ */
+void pantryc_sqlite__remove_rejected_receipt_address(char *address);
 
 /**
  * Get rejected receipt address list

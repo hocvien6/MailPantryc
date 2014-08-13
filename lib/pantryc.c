@@ -26,6 +26,16 @@ pantryc_milter__xxfi_data, /* DATA command */
 pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 };
 
+void pantryc__add_rejected_receipt_address(address)
+	char * address; {
+	pantryc_sqlite__add_rejected_receipt_address(address);
+}
+
+void pantryc__remove_rejected_receipt_address(address)
+	char * address; {
+	pantryc_sqlite__remove_rejected_receipt_address(address);
+}
+
 bool pantryc__set_port(port)
 	char *port; {
 
@@ -56,20 +66,12 @@ bool pantryc__set_timeout(timeout)
 
 int pantryc__run(argc, argv)
 	int argc;char **argv; {
-	pantryc__open_database();
 	if (!setport) {
 		exit(EX_USAGE);
 	}
 	if (smfi_register(milter) == MI_FAILURE) {
 		exit(EX_UNAVAILABLE);
 	}
-
-	// TESTING
-	pantryc_sqlite__add_rejected_receipt_address("wem1");
-	pantryc_sqlite__add_rejected_receipt_address("foo1");
-	pantryc_sqlite__add_rejected_receipt_address("bar1");
-	PantrycList *list = pantryc_sqlite__get_rejected_receipt_address_list();
-	////
 
 	return smfi_main();
 }
