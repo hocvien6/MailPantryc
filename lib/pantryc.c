@@ -63,6 +63,14 @@ int pantryc__run(argc, argv)
 	if (smfi_register(milter) == MI_FAILURE) {
 		exit(EX_UNAVAILABLE);
 	}
+
+	// TESTING
+	pantryc_sqlite__add_rejected_receipt_address("wem1");
+	pantryc_sqlite__add_rejected_receipt_address("foo1");
+	pantryc_sqlite__add_rejected_receipt_address("bar1");
+	PantrycList *list = pantryc_sqlite__get_rejected_receipt_address_list();
+	////
+
 	return smfi_main();
 }
 

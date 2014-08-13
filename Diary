@@ -113,3 +113,6 @@ Wed 08/13/2014:
 - Write function:
 	+ pantryc_scanner__get_content // TODO, pantryc_scanner__read_attachment // TODO
 		(pantryc_scanner)
+- Template, Container and Lambda expression in C... WOW!!!
+Reference:
+http://byteworm.com/2010/10/12/container/
