@@ -4,11 +4,9 @@
 #include <libmilter/mfapi.h>
 
 #include <pantryc-scanner.h>
-#include <pantryc-list.h>
 
 char *pantryc_milter__working_directory;
 int pantryc_milter__attachment_permission;
-PantrycList *pantryc_milter__rejected_receipt_addresses;
 
 /**
  * #Pantryc_milter_structure_function

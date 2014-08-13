@@ -8,10 +8,8 @@ gchar* pantryc_scanner__get_recip(message, type)
 	GMimeMessage *message;GMimeRecipientType type; {
 	char *recip;
 	InternetAddressList *receps;
-
 	receps = g_mime_message_get_recipients(message, type);
 	recip = (char*) internet_address_list_to_string(receps, FALSE);
-
 	if (!recip || !*recip) {
 		g_free(recip);
 		return NULL;
@@ -27,10 +25,8 @@ gchar* pantryc_scanner__get_date(message)
 	char buf[64];
 	size_t length;
 	struct tm *time;
-
 	g_mime_message_get_date(message, &timer, &timezone);
 	time = localtime(&timer);
-
 	length = strftime(buf, sizeof(buf) - 1, "%c", time);
 
 	if (length > 0) {
@@ -38,6 +34,7 @@ gchar* pantryc_scanner__get_date(message)
 		sprintf(date, "%s (%s%04d)", buf, timezone < 0 ? "-" : "+", timezone);
 		return date;
 	}
+
 	return NULL;
 }
 

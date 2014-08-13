@@ -12,14 +12,13 @@ typedef struct {
 	char *helofrom;
 	FILE *mail;
 	FILE *log;
-	int permission; /* attachment permission */
 } PantrycData;
 
 #define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(context))
 
-sfsistat pantryc_milter__cleanup(SMFICTX *context, bool ok);
-void pantryc_milter__free_pantrycData(PantrycData *data);
-void pantryc_milter__write_message_to_log(PantrycData *data,
+static sfsistat pantryc_milter__cleanup(SMFICTX *context, bool ok);
+static void pantryc_milter__free_pantrycData(PantrycData *data);
+static void pantryc_milter__write_message_to_log(PantrycData *data,
 		GMimeMessage *message);
 
 sfsistat pantryc_milter__xxfi_connect(context, hostname, hostaddr)
@@ -130,10 +129,7 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
 	char *rcptaddr = smfi_getsymval(context, "{rcpt_addr}");
 	/* log this recipient */
-	if (!PANTRYC_LIST__IS_NULL(
-			pantryc_milter__rejected_receipt_addresses) && rcptaddr != NULL) {
-		PantrycList *seeker;
-		PANTRYC_LIST__TRAVERSE(seeker, pantryc_milter__rejected_receipt_addresses)
+	/* TODO
 		{
 			if (strcasecmp(rcptaddr, (char*) pantryc_list__get_value(seeker))
 					== 0) {
@@ -145,6 +141,7 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 			}
 		}
 	}
+	*/
 	/* continue processing */
 	return SMFIS_CONTINUE;
 }
@@ -216,10 +213,10 @@ sfsistat pantryc_milter__xxfi_eom(context)
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(
 				(GMimeMultipart*) message->mime_part);
-		data->permission = pantryc_milter__attachment_permission;
 		int i;
 		for (i = 0; i <= number_of_parts - 1; i++) {
-			pantryc_scanner__extract_attachment(message, i, data->permission,
+			pantryc_scanner__extract_attachment(message, i,
+					pantryc_milter__attachment_permission,
 					pantryc_milter__working_directory);
 		}
 	}
@@ -263,7 +260,7 @@ sfsistat pantryc_milter__xxfi_negotiate(context, f0, f1, f2, f3, pf0, pf1, pf2,
 
 /* Private functions */
 
-sfsistat pantryc_milter__cleanup(context, ok)
+static sfsistat pantryc_milter__cleanup(context, ok)
 	SMFICTX *context;bool ok; {
 	sfsistat status = SMFIS_CONTINUE;
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
@@ -296,7 +293,7 @@ sfsistat pantryc_milter__cleanup(context, ok)
 	return status;
 }
 
-void pantryc_milter__free_pantrycData(data)
+static void pantryc_milter__free_pantrycData(data)
 	PantrycData *data; {
 	if (data->buffer != NULL)
 		free(data->buffer);
@@ -307,7 +304,7 @@ void pantryc_milter__free_pantrycData(data)
 	free(data);
 }
 
-void pantryc_milter__write_message_to_log(data, message)
+static void pantryc_milter__write_message_to_log(data, message)
 	PantrycData *data;GMimeMessage *message; {
 	gchar *val;
 	const gchar *str;

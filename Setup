@@ -30,7 +30,7 @@ b.
 
 6. Setting up and using sqlite3
 # apt-get install libsqlite3-dev
-- Add library "sqlite3"
+- Add library "sqlite3"									# NO LONGER NEEDED
 
 7. Add own Include path to project
 "${workspace_loc:/${ProjName}/include}"
