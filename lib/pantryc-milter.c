@@ -19,6 +19,7 @@ static sfsistat pantryc_milter__cleanup(SMFICTX *context, pBOOL ok);
 static void pantryc_milter__free_pantrycData(PantrycData *data);
 static void pantryc_milter__write_message_to_log(PantrycData *data,
 		GMimeMessage *message);
+static int pantryc_milter__calculate_score_content(gchar *content);
 
 sfsistat pantryc_milter__xxfi_connect(context, hostname, hostaddr)
 	SMFICTX *context;char *hostname;_SOCK_ADDR *hostaddr; {
@@ -176,6 +177,7 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		g_warning("Cannot open stream");
 	}
 
+	/* Parse the message only once at this time */
 	GMimeParser *parser;
 	GMimeMessage *message;
 	parser = NULL;
@@ -189,7 +191,11 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		g_warning("failed to construct message");
 	}
 	pantryc_milter__write_message_to_log(data, message);
-
+	// TESTING
+	int score = pantryc_milter__calculate_score_content(
+			pantryc_scanner__get_content(message, 0));
+	printf("score: %d", score);
+	////
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(
 				(GMimeMultipart*) message->mime_part);
@@ -315,4 +321,9 @@ static void pantryc_milter__write_message_to_log(data, message)
 	fprintf(pantryc_global__log_file, "Refs:		%s\n",
 			refsstr ? refsstr : "<none>");
 	g_free(refsstr);
+}
+
+static int pantryc_milter__calculate_score_content(gchar *content) {
+	int score = 0;
+	return score;
 }

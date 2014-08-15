@@ -122,3 +122,9 @@ http://byteworm.com/2010/10/12/container/
 Fri 08/15/2014:
 - Write pantryc: main library
 - Re-range some function and define macro
+	(pantryc-environment, pantryc-sqlite, pantryc-global)
+- Delete pantryc-list: no longer needed
+- Write function:
+	+ pantryc_sqlite__insert_bad_word, pantryc_sqlite__delete_bad_word, pantryc_sqlite__get_score_bad_word
+		(pantryc-sqlite)
+- Learn how to use sprintf function

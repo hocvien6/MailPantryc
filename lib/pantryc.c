@@ -15,7 +15,7 @@ int pantryc__born(directory, permission, port, timeout)
 
 void pantryc__learn_add_rejected_receipt_address(address)
 	char * address; {
-	pantryc_sqlite__add_rejected_receipt_address(address);
+	pantryc_sqlite__insert_rejected_receipt_address(address);
 }
 
 int pantryc__work(argc, argv)
