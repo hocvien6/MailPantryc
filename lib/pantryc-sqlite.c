@@ -115,6 +115,10 @@ pBOOL pantryc_sqlite__check_rejected_receipt_address_list(address)
 	return data;
 }
 
+pBOOL pantryc_sqlite__close_database() {
+	return sqlite3_close(pantryc_sqlite__database);
+}
+
 /* Private function */
 static void pantryc_sqlite__initialize(column)
 	char *column; {
@@ -176,8 +180,4 @@ static void pantryc_sqlite__initialize(column)
 	}
 	sqlite3_free(error);
 	return;
-}
-
-pBOOL pantryc_sqlite__close_database() {
-	return sqlite3_close(pantryc_sqlite__database);
 }
