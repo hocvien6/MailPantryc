@@ -128,3 +128,5 @@ Fri 08/15/2014:
 	+ pantryc_sqlite__insert_bad_word, pantryc_sqlite__delete_bad_word, pantryc_sqlite__get_score_bad_word
 		(pantryc-sqlite)
 - Learn how to use sprintf function
+- NOTE: callback function isn't be called if sqlite3_exec run successfully but return no result
+	--> spamie afternoon!!! I hate sqlite3!!!
