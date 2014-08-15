@@ -70,9 +70,4 @@ int pantryc_environment__run(argc, argv)
 
 	return smfi_main();
 }
-
-pBOOL pantryc_environment__quit() {
-	return sqlite3_close(pantryc_sqlite__database)
-			&& fclose(pantryc_global__log_file);
-}
 /* eof */

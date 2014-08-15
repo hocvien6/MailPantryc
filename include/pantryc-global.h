@@ -31,4 +31,9 @@ void pantryc_global__change_attachment_permission(const int permission);
  */
 void pantryc_global__create_log_file();
 
+/**
+ * Close log file
+ */
+pBOOL pantryc_global__close_log_file();
+
 #endif /* PANTRYC_GLOBAL_H_ */

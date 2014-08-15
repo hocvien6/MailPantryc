@@ -92,25 +92,12 @@ sfsistat pantryc_milter__xxfi_envfrom(context, argv)
 
 #endif /* WIN32 */
 
-	// TESTING, TODO rename log file, #logfullname; change log file mod
-	printf("from: %s\n", smfi_getsymval(context, "{mail_addr}"));
-
 	PantrycData *data = PANTRYC_MILTER__GET_PRIVATE_DATA;
-	char *logfullname;
-	logfullname = (char*) malloc(100 * sizeof(char));
-	strcpy(logfullname, pantryc_global__working_directory);
-	strcat(logfullname, "log.txt");
-	if ((pantryc_global__log_file = fopen(logfullname, "w+")) == NULL) {
-		(void) fclose(pantryc_global__log_file);
-		(void) pantryc_milter__cleanup(context, pFALSE);
-		return SMFIS_TEMPFAIL;
-	}
 	if ((data->mail = open_memstream(&data->buffer, &data->size)) == NULL) {
 		(void) fclose(data->mail);
 		(void) pantryc_milter__cleanup(context, pFALSE);
 		return SMFIS_TEMPFAIL;
 	}
-	////
 
 	/* count the arguments */
 	while (*argv++ != NULL)
@@ -278,12 +265,6 @@ static sfsistat pantryc_milter__cleanup(context, ok)
 		status = SMFIS_TEMPFAIL;
 	}
 
-	if (pantryc_global__log_file != NULL
-			&& fclose(pantryc_global__log_file) == EOF) {
-		fprintf(pantryc_global__log_file,
-				"Couldn't close log file (error: %s)\n", strerror(errno));
-		status = SMFIS_TEMPFAIL;
-	}
 	/* close the archive file */
 	if (data->mail != NULL && fclose(data->mail) == EOF) {
 		/* failed; we have to wait until later */

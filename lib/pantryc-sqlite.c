@@ -157,12 +157,12 @@ static void pantryc_sqlite__initialize(column)
 					&error);
 			if (result != SQLITE_OK) {
 				fprintf(pantryc_global__log_file,
-						"**ERROR** Cannot initialize, %s\n", error);
+						"**ERROR**		Cannot initialize, %s\n", error);
 				sqlite3_free(error);
 				return;
 			} else {
 				fprintf(pantryc_global__log_file,
-						"Add column %s"
+						"**WARNING**	Add column %s"
 								" on table " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS "\n",
 						column);
 			}
@@ -170,4 +170,8 @@ static void pantryc_sqlite__initialize(column)
 	}
 	sqlite3_free(error);
 	return;
+}
+
+pBOOL pantryc_sqlite__close_database() {
+	return sqlite3_close(pantryc_sqlite__database);
 }

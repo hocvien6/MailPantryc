@@ -1,6 +1,7 @@
 #include "../include/pantryc.h"
+#include "../include/pantryc-environment.h"
 
-pBOOL pantryc__born(directory, permission, port, timeout)
+int pantryc__born(directory, permission, port, timeout)
 	const char *directory;const int permission;char *port;char *timeout; {
 	pantryc_global__change_working_directory(directory);
 	pantryc_global__change_attachment_permission(permission);
@@ -22,6 +23,8 @@ int pantryc__work(argc, argv)
 	return pantryc_environment__run(argc, argv);
 }
 
-pBOOL pantryc__die() {
-	return pantryc_environment__quit();
+int pantryc__die() {
+	pBOOL closelogfile = pantryc_global__close_log_file();
+	pBOOL closedatabase = pantryc_sqlite__close_database();
+	return closelogfile && closedatabase;
 }

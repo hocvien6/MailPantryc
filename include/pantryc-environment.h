@@ -26,11 +26,4 @@ pBOOL pantryc_environment__set_timeout(char *timeout);
  */
 int pantryc_environment__run(int argc, char **argv);
 
-/**
- * Pantryc milter quit
- * return
- */
-pBOOL pantryc_environment__quit();
-
-
 #endif /* PANTRYC_ENVIRONMENT_H_ */

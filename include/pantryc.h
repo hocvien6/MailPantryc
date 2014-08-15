@@ -1,8 +1,6 @@
 #ifndef PANTRYC_H_
 #define PANTRYC_H_
 
-#include <pantryc-environment.h>
-
 /**
  * Born
  * @directory:		where extract attachments and store log file for each message
@@ -10,7 +8,7 @@
  * @port:			port to set (ex: f1.sock...)
  * @timeout:		time out
  */
-pBOOL pantryc__born(const char *directory, const int permission, char *port, char *timeout);
+int pantryc__born(const char *directory, const int permission, char *port, char *timeout);
 
 /**
  * Learn how to add rejected receipt address
@@ -28,6 +26,6 @@ int pantryc__work(int argc, char **argv);
 /**
  * Die
  */
-pBOOL pantryc__die();
+int pantryc__die();
 
 #endif /* PANTRYC_H_ */

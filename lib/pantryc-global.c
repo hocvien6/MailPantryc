@@ -21,6 +21,7 @@ void pantryc_global__change_attachment_permission(permission)
 }
 
 void pantryc_global__create_log_file() {
+	// TESTING, TODO rename log file, #filename; change log file mod
 	char *filename = (char*) malloc(
 			sizeof(char)
 					* (strlen(pantryc_global__working_directory)
@@ -28,4 +29,12 @@ void pantryc_global__create_log_file() {
 	strcpy(filename, pantryc_global__working_directory);
 	strcat(filename, PANTRYC_GLOBAL__LOG_FILE);
 	pantryc_global__log_file = fopen(filename, "w+");
+}
+
+pBOOL pantryc_global__close_log_file() {
+	if (pantryc_global__log_file != NULL
+			&& fclose(pantryc_global__log_file) == EOF) {
+		return pFALSE;
+	}
+	return pTRUE;
 }
