@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 
 #include <pantryc-global.h>
+#include <pantryc-list.h>
 
 #define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
 #define PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS			"RejectedReceiptAddress"
@@ -15,8 +16,9 @@ sqlite3 *pantryc_sqlite__database;
 
 /**
  * Open Pantryc Database
+ * return			open successfully or not
  */
-void pantryc_sqlite__open_database();
+pBOOL pantryc_sqlite__open_database();
 
 /**
  * Add an address to rejected recipients list

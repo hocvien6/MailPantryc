@@ -5,9 +5,9 @@
 
 #include "../include/pantryc-environment.h"
 
-bool setport = FALSE;
+static pBOOL pantryc_environment__setport = pFALSE;
 
-pantrycMilter milter = { "PantrycMilter", /* filter name */
+pantrycMilter pantryc_environment__milter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
 SMFIF_ADDHDRS | SMFIF_ADDRCPT,
 /* flags */
@@ -26,11 +26,11 @@ pantryc_milter__xxfi_data, /* DATA command */
 pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 };
 
-bool pantryc_environment__set_port(port)
+pBOOL pantryc_environment__set_port(port)
 	char *port; {
 
 	if (smfi_setconn(port) == MI_FAILURE) {
-		setport = FALSE;
+		pantryc_environment__setport = pFALSE;
 	} else {
 		/*
 		 * If we're using a local socket, make sure it
@@ -41,32 +41,32 @@ bool pantryc_environment__set_port(port)
 			unlink(port + 5);
 		else if (strncasecmp(port, "local:", 6) == 0)
 			unlink(port + 6);
-		setport = TRUE;
+		pantryc_environment__setport = pTRUE;
 	}
-	return setport;
+	return pantryc_environment__setport;
 }
 
-bool pantryc_environment__set_timeout(timeout)
+pBOOL pantryc_environment__set_timeout(timeout)
 	char *timeout; {
 	if (smfi_settimeout(atoi(timeout)) == MI_FAILURE) {
-		return FALSE;
+		return pFALSE;
 	}
-	return TRUE;
+	return pTRUE;
 }
 
 int pantryc_environment__run(argc, argv)
 	int argc;char **argv; {
-	if (!setport) {
+	if (!pantryc_environment__setport) {
 		exit(EX_USAGE);
 	}
-	if (smfi_register(milter) == MI_FAILURE) {
+	if (smfi_register(pantryc_environment__milter) == MI_FAILURE) {
 		exit(EX_UNAVAILABLE);
 	}
 
 	return smfi_main();
 }
 
-int pantryc_environment__quit() {
+pBOOL pantryc_environment__quit() {
 	return sqlite3_close(pantryc_sqlite__database)
 			&& fclose(pantryc_global__log_file);
 }

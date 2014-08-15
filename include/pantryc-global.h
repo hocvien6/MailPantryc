@@ -3,9 +3,12 @@
 
 #include <stdio.h>
 
-#include <pantryc-list.h>
-
 #define PANTRYC_GLOBAL__LOG_FILE	"log.txt"
+
+// TODO rename macro
+#define pFALSE		(0)
+#define pTRUE		!pFALSE
+typedef int pBOOL;
 
 char *pantryc_global__working_directory;
 FILE *pantryc_global__log_file;

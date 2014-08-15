@@ -2,8 +2,7 @@
 
 #include "../include/pantryc-list.h"
 
-void pantryc_list__insert_before(PantrycList *node, void *value);
-void pantryc_list__insert_after(PantrycList *node, void *value);
+static void pantryc_list__insert_before(PantrycList *node, void *value);
 
 PantrycList* pantryc_list__new(void) {
 	PantrycList *list;
@@ -30,7 +29,7 @@ void pantryc_list__delete_node(node)
 	free(node);
 }
 
-int pantryc_list__is_empty(list)
+pBOOL pantryc_list__is_empty(list)
 	const PantrycList *list; {
 	return (list->next == list);
 }
@@ -50,7 +49,7 @@ void pantryc_list__free(list)
 
 /*Private functions */
 
-void pantryc_list__insert_before(node, value)
+static void pantryc_list__insert_before(node, value)
 	PantrycList *node;void *value; {
 	PantrycList *newnode;
 	newnode = (PantrycList*) malloc(sizeof(struct pantrycList));
@@ -59,9 +58,4 @@ void pantryc_list__insert_before(node, value)
 	newnode->previous = node->previous;
 	newnode->next->previous = newnode;
 	newnode->previous->next = newnode;
-}
-
-void pantryc_list__insert_after(node, value)
-	PantrycList *node;void *value; {
-	pantryc_list__insert_before(node->next, value);
 }

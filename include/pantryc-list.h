@@ -1,6 +1,8 @@
 #ifndef PANTRYC_LIST_H_
 #define PANTRYC_LIST_H_
 
+#include <pantryc-global.h>
+
 typedef struct pantrycList {
 	struct pantrycList *next;
 	struct pantrycList *previous;
@@ -37,8 +39,7 @@ void pantryc_list__delete_node(PantrycList *node);
  * Check whether list is empty
  * return			list is empty or not
  */
-// TODO change return type to bool
-int pantryc_list__is_empty(const PantrycList *list);
+pBOOL pantryc_list__is_empty(const PantrycList *list);
 
 /**
  * Get value from node

@@ -7,7 +7,7 @@
 
 static void pantryc_sqlite__initialize(char *column);
 
-void pantryc_sqlite__open_database() {
+pBOOL pantryc_sqlite__open_database() {
 	int result;
 	char *filename = (char*) malloc(
 			sizeof(char)
@@ -19,9 +19,11 @@ void pantryc_sqlite__open_database() {
 
 	if (result) {
 		fprintf(pantryc_global__log_file,
-				"Cannot open database " PANTRYC_SQLITE__DATABASE "\n");
+				"**ERROR**		Cannot open database " PANTRYC_SQLITE__DATABASE "\n");
 		pantryc_sqlite__database = NULL;
+		return pFALSE;
 	}
+	return pTRUE;
 }
 
 void pantryc_sqlite__add_rejected_receipt_address(address)
@@ -39,14 +41,17 @@ void pantryc_sqlite__add_rejected_receipt_address(address)
 			&error);
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_global__log_file,
-				"**ERROR** Cannot add rejected receipt address, %s\n", error);
+				"**ERROR**		Cannot add rejected receipt address, %s\n", error);
+		sqlite3_free(error);
 		return;
 	} else {
 		fprintf(pantryc_global__log_file,
-				"Insert address %s to column " PANTRYC_SQLITE__COLUMN_ADDRESS
+				"Add address %s to column " PANTRYC_SQLITE__COLUMN_ADDRESS
 				" on table " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS "\n",
 				address);
 	}
+	sqlite3_free(error);
+	return;
 }
 
 void pantryc_sqlite__remove_rejected_receipt_address(address)
@@ -59,13 +64,13 @@ void pantryc_sqlite__remove_rejected_receipt_address(address)
 	strcat(sql, "';");
 
 	char *error;
-
 	int result = sqlite3_exec(pantryc_sqlite__database, sql, NULL, NULL,
 			&error);
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_global__log_file,
-				"**ERROR** Cannot remove rejected receipt address, %s\n",
+				"**ERROR**		Cannot remove rejected receipt address, %s\n",
 				error);
+		sqlite3_free(error);
 		return;
 	} else {
 		fprintf(pantryc_global__log_file,
@@ -73,9 +78,12 @@ void pantryc_sqlite__remove_rejected_receipt_address(address)
 				" on table " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS "\n",
 				address);
 	}
+	sqlite3_free(error);
+	return;
 }
 
 PantrycList* pantryc_sqlite__get_rejected_receipt_address_list() {
+	pantryc_sqlite__initialize(PANTRYC_SQLITE__COLUMN_ADDRESS);
 	PantrycList *list = pantryc_list__new();
 	char *sql = (char*) malloc(sizeof(char) * PANTRYC_SQLITE__SQL_LENGTH);
 	strcpy(sql, "select " PANTRYC_SQLITE__COLUMN_ADDRESS
@@ -89,7 +97,7 @@ PantrycList* pantryc_sqlite__get_rejected_receipt_address_list() {
 									return 0;}$;}), (void*) list, &error);
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_global__log_file,
-				"**ERROR** Cannot get rejected receipt address list, %s\n",
+				"**ERROR**		Cannot get rejected receipt address list, %s\n",
 				error);
 		return NULL;
 	}
@@ -119,12 +127,13 @@ static void pantryc_sqlite__initialize(column)
 				&error);
 		if (result != SQLITE_OK) {
 			fprintf(pantryc_global__log_file,
-					"**ERROR** Cannot initialize, %s\n", error);
+					"**ERROR**		Cannot initialize, %s\n", error);
+			sqlite3_free(error);
+			return;
 		} else {
 			fprintf(pantryc_global__log_file,
-					"Create table " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS "\n");
+					"**WARNING**	Create table " PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS "\n");
 		}
-		sqlite3_free(error);
 	} else {
 		strcpy(sql, "select ");
 		strcat(sql, column);
@@ -145,6 +154,8 @@ static void pantryc_sqlite__initialize(column)
 			if (result != SQLITE_OK) {
 				fprintf(pantryc_global__log_file,
 						"**ERROR** Cannot initialize, %s\n", error);
+				sqlite3_free(error);
+				return;
 			} else {
 				fprintf(pantryc_global__log_file,
 						"Add column %s"
@@ -153,4 +164,6 @@ static void pantryc_sqlite__initialize(column)
 			}
 		}
 	}
+	sqlite3_free(error);
+	return;
 }
