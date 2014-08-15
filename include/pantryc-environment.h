@@ -1,5 +1,5 @@
-#ifndef PANTRYC_H_
-#define PANTRYC_H_
+#ifndef PANTRYC_ENVIRONMENT_H_
+#define PANTRYC_ENVIRONMENT_H_
 
 #include <pantryc-milter.h>
 
@@ -32,4 +32,5 @@ int pantryc_environment__run(int argc, char **argv);
  */
 pBOOL pantryc_environment__quit();
 
-#endif /* PANTRYC_H_ */
+
+#endif /* PANTRYC_ENVIRONMENT_H_ */
