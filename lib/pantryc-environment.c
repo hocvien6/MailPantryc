@@ -28,30 +28,35 @@ pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 
 pBOOL pantryc_environment__set_port(port)
 	char *port; {
-
-	if (smfi_setconn(port) == MI_FAILURE) {
-		pantryc_environment__setport = pFALSE;
-	} else {
-		/*
-		 * If we're using a local socket, make sure it
-		 * doesn't already exist.  Don't ever run this
-		 * code as root!!
-		 */
-		if (strncasecmp(port, "unix:", 5) == 0)
-			unlink(port + 5);
-		else if (strncasecmp(port, "local:", 6) == 0)
-			unlink(port + 6);
-		pantryc_environment__setport = pTRUE;
-	}
-	return pantryc_environment__setport;
+	if (port != NULL) {
+		if (smfi_setconn(port) == MI_FAILURE) {
+			pantryc_environment__setport = pFALSE;
+		} else {
+			/*
+			 * If we're using a local socket, make sure it
+			 * doesn't already exist.  Don't ever run this
+			 * code as root!!
+			 */
+			if (strncasecmp(port, "unix:", 5) == 0)
+				unlink(port + 5);
+			else if (strncasecmp(port, "local:", 6) == 0)
+				unlink(port + 6);
+			pantryc_environment__setport = pTRUE;
+		}
+		return pantryc_environment__setport;
+	} else
+		return pFALSE;
 }
 
 pBOOL pantryc_environment__set_timeout(timeout)
 	char *timeout; {
-	if (smfi_settimeout(atoi(timeout)) == MI_FAILURE) {
+	if (timeout != NULL) {
+		if (smfi_settimeout(atoi(timeout)) == MI_FAILURE) {
+			return pFALSE;
+		}
+		return pTRUE;
+	} else
 		return pFALSE;
-	}
-	return pTRUE;
 }
 
 int pantryc_environment__run(argc, argv)

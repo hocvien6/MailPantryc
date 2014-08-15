@@ -5,12 +5,14 @@
 
 void pantryc_global__change_working_directory(directory)
 	const char *directory; {
-	if (pantryc_global__working_directory != NULL) {
-		free(pantryc_global__working_directory);
+	if (directory != NULL) {
+		if (pantryc_global__working_directory != NULL) {
+			free(pantryc_global__working_directory);
+		}
+		pantryc_global__working_directory = (char*) malloc(
+				(strlen(directory) + 1) * sizeof(char));
+		strcpy(pantryc_global__working_directory, directory);
 	}
-	pantryc_global__working_directory = (char*) malloc(
-			(strlen(directory) + 1) * sizeof(char));
-	strcpy(pantryc_global__working_directory, directory);
 }
 
 void pantryc_global__change_attachment_permission(permission)
