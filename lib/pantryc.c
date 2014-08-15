@@ -6,7 +6,10 @@ pBOOL pantryc__born(directory, permission, port, timeout)
 	pantryc_global__change_attachment_permission(permission);
 	pBOOL setport = pantryc_environment__set_port(port);
 	pBOOL settimeout = pantryc_environment__set_timeout(timeout);
-	return setport && settimeout;
+
+	pantryc_global__create_log_file();
+	pBOOL opendatabase = pantryc_sqlite__open_database();
+	return setport && settimeout && opendatabase;
 }
 
 void pantryc__learn_add_rejected_receipt_address(address)
@@ -16,11 +19,7 @@ void pantryc__learn_add_rejected_receipt_address(address)
 
 int pantryc__work(argc, argv)
 	int argc;char **argv; {
-	pantryc_global__create_log_file();
-	if (pantryc_sqlite__open_database() == pFALSE)
-		return pFALSE;
-	else
-		return pantryc_environment__run(argc, argv);
+	return pantryc_environment__run(argc, argv);
 }
 
 pBOOL pantryc__die() {

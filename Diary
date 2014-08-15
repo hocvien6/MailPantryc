@@ -118,3 +118,7 @@ Reference:
 http://byteworm.com/2010/10/12/container/
 - Write pantryc-sqlite: integrate to sqlite database management
 - Create and store some variable at pantryc-global
+
+Fri 08/15/2014:
+- Write pantryc: main library
+- Re-range some function and define macro
