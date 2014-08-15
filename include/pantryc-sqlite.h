@@ -34,9 +34,10 @@ void pantryc_sqlite__remove_rejected_receipt_address(char *address);
 
 /**
  * Get rejected receipt address list
- * return			list of rejected receipt addresses
+ * @address			address to check
+ * return			address is rejected or not
  */
-PantrycList* pantryc_sqlite__get_rejected_receipt_address_list();
+pBOOL pantryc_sqlite__check_rejected_receipt_address_list(char *address);
 
 /**
  * Close Pantryc Database

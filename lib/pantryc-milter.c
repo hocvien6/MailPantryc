@@ -114,21 +114,13 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 		++argc;
 	char *rcptaddr = smfi_getsymval(context, "{rcpt_addr}");
 	/* log this recipient */
-	PantrycList *list = pantryc_sqlite__get_rejected_receipt_address_list();
-	if (!PANTRYC_LIST__IS_NULL(list) && rcptaddr != NULL) {
-		PantrycList *seeker;
-		PANTRYC_LIST__TRAVERSE(seeker, list)
-		{
-			if (strcasecmp(rcptaddr, (char*) pantryc_list__get_value(seeker))
-					== 0) {
-				if (fprintf(pantryc_global__log_file, "RCPT %s -- REJECTED\n",
-						rcptaddr) == EOF) {
-					(void) pantryc_milter__cleanup(context, pFALSE);
-					return SMFIS_TEMPFAIL;
-				}
-				return SMFIS_REJECT;
-			}
+	if (pantryc_sqlite__check_rejected_receipt_address_list(rcptaddr)) {
+		if (fprintf(pantryc_global__log_file, "RCPT %s -- REJECTED\n",
+				rcptaddr) == EOF) {
+			(void) pantryc_milter__cleanup(context, pFALSE);
+			return SMFIS_TEMPFAIL;
 		}
+		return SMFIS_REJECT;
 	}
 	/* continue processing */
 	return SMFIS_CONTINUE;
