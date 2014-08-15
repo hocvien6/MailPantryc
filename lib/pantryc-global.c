@@ -21,7 +21,7 @@ void pantryc_global__change_attachment_permission(permission)
 }
 
 void pantryc_global__create_log_file() {
-	// TESTING, TODO rename log file, #filename; change log file mod
+	// TESTING TODO rename log file, #filename; change log file mode
 	char *filename = (char*) malloc(
 			sizeof(char)
 					* (strlen(pantryc_global__working_directory)

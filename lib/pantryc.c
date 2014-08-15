@@ -13,9 +13,14 @@ int pantryc__born(directory, permission, port, timeout)
 	return setport && settimeout && opendatabase;
 }
 
-void pantryc__learn_add_rejected_receipt_address(address)
+void pantryc__learn_insert_rejected_receipt_address(address)
 	char * address; {
 	pantryc_sqlite__insert_rejected_receipt_address(address);
+}
+
+void pantryc__learn_insert_bad_word(word, score)
+	char *word;int score; {
+	pantryc_sqlite__insert_bad_word(word, score);
 }
 
 int pantryc__work(argc, argv)

@@ -3,6 +3,15 @@
 
 #include "../include/pantryc-sqlite.h"
 
+#define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
+#define PANTRYC_SQLITE__TABLE_ADDRESS							"Address"
+#define PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT			"RejectedReceipt"
+#define PANTRYC_SQLITE__TABLE_WORD								"Word"
+#define PANTRYC_SQLITE__COLUMN_WORD_BAD							"Bad"
+#define PANTRYC_SQLITE__COLUMN_WORD_SCORE						"Score"
+
+#define PANTRYC_SQLITE__TEXT_LENGTH								"50"
+
 #define PANTRYC_SQLITE__SQL_LENGTH 200
 #define PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(message)			\
 	char *message = (char*) malloc(sizeof(char) * PANTRYC_SQLITE__SQL_LENGTH)
@@ -89,7 +98,7 @@ pBOOL pantryc_sqlite__check_rejected_receipt_address_list(address)
 	" from " PANTRYC_SQLITE__TABLE_ADDRESS
 	" where " PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT " = '%s';",
 			address);
-	sprintf(failure, "Cannot get rejected receipt address list");
+	sprintf(failure, "Cannot get rejected receipt address '%s'", address);
 	int data = 0;
 
 	int result =
@@ -106,19 +115,78 @@ pBOOL pantryc_sqlite__check_rejected_receipt_address_list(address)
 	return data;
 }
 
-void pantryc_sqlite__insert_bad_word(word)
-	char*word; {
+void pantryc_sqlite__insert_bad_word(word, score)
+	char*word;int score; {
+	if (word != NULL) {
+		pantryc_sqlite__initialize(
+		PANTRYC_SQLITE__TABLE_WORD,
+		PANTRYC_SQLITE__COLUMN_WORD_BAD);
 
+		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
+		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(success);
+		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
+		char *error;
+		sprintf(sql,
+				"insert into " PANTRYC_SQLITE__TABLE_WORD
+				" (" PANTRYC_SQLITE__COLUMN_WORD_BAD ", " PANTRYC_SQLITE__COLUMN_WORD_SCORE ")"
+				" values ('%s, %d')", word, score);
+		sprintf(success,
+				"Add word '%s' with score %d to column \"" PANTRYC_SQLITE__COLUMN_WORD_BAD
+				"\" on table \"" PANTRYC_SQLITE__TABLE_WORD "\"", word, score);
+		sprintf(failure, "Cannot add word '%s'", word);
+		pantryc_sqlite__execute(sql, NULL, NULL, success, failure, &error);
+	}
 }
 
 void pantryc_sqlite__delete_bad_word(word)
 	char*word; {
+	if (word != NULL) {
+		pantryc_sqlite__initialize(
+		PANTRYC_SQLITE__TABLE_WORD,
+		PANTRYC_SQLITE__COLUMN_WORD_BAD);
+
+		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
+		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(success);
+		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
+		char *error;
+		sprintf(sql, "delete from " PANTRYC_SQLITE__TABLE_WORD
+		" where " PANTRYC_SQLITE__COLUMN_WORD_BAD " = '%s';", word);
+		sprintf(success,
+				"Remove word '%s' from column \"" PANTRYC_SQLITE__COLUMN_WORD_BAD
+				"\" on table \"" PANTRYC_SQLITE__TABLE_WORD "\"", word);
+		sprintf(failure, "Cannot remove word '%s'", word);
+		pantryc_sqlite__execute(sql, NULL, NULL, success, failure, &error);
+	}
 
 }
 
 int pantryc_sqlite__get_score_bad_word(word)
 	char*word; {
-	return 1;
+	pantryc_sqlite__initialize(
+	PANTRYC_SQLITE__TABLE_WORD,
+	PANTRYC_SQLITE__COLUMN_WORD_BAD);
+
+	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
+	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
+	char *error;
+	sprintf(sql, "select " PANTRYC_SQLITE__COLUMN_WORD_BAD
+	" from " PANTRYC_SQLITE__TABLE_WORD
+	" where " PANTRYC_SQLITE__COLUMN_WORD_BAD " = '%s';", word);
+	sprintf(failure, "Cannot get score of bad word '%s'", word);
+	int data = 0;
+
+	int result =
+			pantryc_sqlite__execute(sql,
+					( {	int $(void *data, int size, char **value, char **column) {
+									*((int*) data) = atoi(value[0]);
+									return 0;
+								}$;
+							}), &data,
+					NULL, failure, &error);
+	if (result != SQLITE_OK)
+		return pFALSE;
+	data = data > 0 ? data : 0;
+	return data;
 }
 
 pBOOL pantryc_sqlite__close_database() {
@@ -142,12 +210,15 @@ static void pantryc_sqlite__initialize(table, column)
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_global__log_file, "**NOTICE**\tNo such table \"%s\"\n",
 				table);
-		/* Create table "Address" */
 		if (strcmp(table, PANTRYC_SQLITE__TABLE_ADDRESS) == 0) {
-			sprintf(sql,/*
-			 "create table %s (" PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT
-			 " char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique);",*/
-			"create table %s (tmp int);", table);
+			/* Create table "Address" */
+			sprintf(sql,
+					"create table %s (" PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT
+					" char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique);", table);
+		} else if (strcmp(table, PANTRYC_SQLITE__TABLE_WORD) == 0) {
+			/* Create table "Word" */
+			sprintf(sql, "create table %s (" PANTRYC_SQLITE__COLUMN_WORD_BAD
+			" char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique);", table);
 		} else
 			return;
 
@@ -163,13 +234,18 @@ static void pantryc_sqlite__initialize(table, column)
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_global__log_file, "**NOTICE**\tNo such column \"%s\"\n",
 				column);
-		/* Add column "RejectedReceipt" */
 		if (strcmp(column, PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT)
 				== 0) {
+			/* Add column "RejectedReceipt" */
 			sprintf(sql, "alter table " PANTRYC_SQLITE__TABLE_ADDRESS
 			" add column %s char(" PANTRYC_SQLITE__TEXT_LENGTH ");", column); // still not unique
-		} else
-			return;
+		} else if (strcmp(column,
+				PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT) == 0) {
+			/* Add column "Score" */
+			sprintf(sql, "alter table " PANTRYC_SQLITE__TABLE_WORD
+			" add column %s char(" PANTRYC_SQLITE__TEXT_LENGTH ");", column); // still not unique
+		}
+		return;
 
 		sprintf(success, "Add column \"%s\""
 				" on table \"%s\"", column, table);

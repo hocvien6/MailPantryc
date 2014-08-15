@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
@@ -194,7 +195,7 @@ sfsistat pantryc_milter__xxfi_eom(context)
 	// TESTING
 	int score = pantryc_milter__calculate_score_content(
 			pantryc_scanner__get_content(message, 0));
-	printf("score: %d", score);
+	printf("score: %d\n", score);
 	////
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(
@@ -325,5 +326,24 @@ static void pantryc_milter__write_message_to_log(data, message)
 
 static int pantryc_milter__calculate_score_content(gchar *content) {
 	int score = 0;
+	int i;
+	char lastchar;
+	char *previous;
+	char *seeker = content;
+
+	previous = seeker;
+	lastchar = ' ';
+	for (i = 0; seeker[i] != '\0'; i++) {
+		if (isspace(seeker[i])) {
+			lastchar = seeker[i];
+			seeker[i] = '\0';
+		} else {
+			if (isspace(lastchar)) {
+				score += pantryc_sqlite__get_score_bad_word(previous);
+			}
+			lastchar = seeker[i];
+		}
+	}
+
 	return score;
 }

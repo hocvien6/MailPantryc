@@ -130,3 +130,4 @@ Fri 08/15/2014:
 - Learn how to use sprintf function
 - NOTE: callback function isn't be called if sqlite3_exec run successfully but return no result
 	--> spamie afternoon!!! I hate sqlite3!!!
+- Start writing function to calculate score of message content base on word database

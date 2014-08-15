@@ -5,14 +5,6 @@
 
 #include <pantryc-global.h>
 
-#define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
-#define PANTRYC_SQLITE__TABLE_ADDRESS							"Address"
-#define PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT			"RejectedReceipt"
-#define PANTRYC_SQLITE__TABLE_WORD								"Word"
-#define PANTRYC_SQLITE__COLUMN_WORD_BAD							"Bad"
-
-#define PANTRYC_SQLITE__TEXT_LENGTH								"50"
-
 sqlite3 *pantryc_sqlite__database;
 
 /**
@@ -43,8 +35,9 @@ pBOOL pantryc_sqlite__check_rejected_receipt_address_list(char *address);
 /**
  * Insert a word with score to bad word list
  * @word:			word to insert
+ * @score:			score
  */
-void pantryc_sqlite__insert_bad_word(char *word);
+void pantryc_sqlite__insert_bad_word(char *word, int score);
 
 /**
  * Delete a word with score from bad word list

@@ -14,7 +14,14 @@ int pantryc__born(const char *directory, const int permission, char *port, char 
  * Learn how to add rejected receipt address
  * @address:		rejected address to add
  */
-void pantryc__learn_add_rejected_receipt_address(char *address);
+void pantryc__learn_insert_rejected_receipt_address(char *address);
+
+/**
+ * Learn how to add bad word
+ * @word:			word to add
+ * @score:			score
+ */
+void pantryc__learn_insert_bad_word(char *word, int score);
 
 /**
  * Work
