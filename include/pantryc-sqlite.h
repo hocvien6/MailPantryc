@@ -4,7 +4,6 @@
 #include <sqlite3.h>
 
 #include <pantryc-global.h>
-#include <pantryc-list.h>
 
 #define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
 #define PANTRYC_SQLITE__TABLE_REJECTED_RECEIPT_ADDRESS			"RejectedReceiptAddress"
