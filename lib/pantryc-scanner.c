@@ -65,9 +65,12 @@ gchar* pantryc_scanner__get_references(message)
 
 gchar* pantryc_scanner__get_content(message, index)
 	GMimeMessage *message;int index; {
-	GMimeMultipart *parts = (GMimeMultipart*) message->mime_part;
-	GMimeObject *object = g_mime_multipart_get_part(parts, index);
-	GMimePart *part = (GMimePart*) object;
+	GMimePart *part;
+	if (GMIME_IS_MULTIPART(message->mime_part)) {
+		GMimeMultipart *parts = (GMimeMultipart*) message->mime_part;
+		part = (GMimePart*) g_mime_multipart_get_part(parts, index);
+	} else
+		part = (GMimePart*) g_mime_message_get_mime_part(message);
 	GMimeStream *stream = g_mime_data_wrapper_get_stream(
 			g_mime_part_get_content_object(part));
 	gint64 length = g_mime_stream_length(stream);
