@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "../include/pantryc-sqlite.h"
 
@@ -178,9 +179,13 @@ int pantryc_sqlite__get_score_bad_word(word)
 	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
 	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
 	char *error;
+
+	int i = -1;
+	while (word[i++] != '\0')
+		word[i] = tolower(word[i]);
 	sprintf(sql, "select " PANTRYC_SQLITE__COLUMN_WORD_SCORE
 	" from " PANTRYC_SQLITE__TABLE_WORD
-	" where " PANTRYC_SQLITE__COLUMN_WORD_BAD " = '%s';", word);
+	" where " PANTRYC_SQLITE__COLUMN_WORD_BAD " = '%s' collate nocase;", word);
 	sprintf(failure, "Cannot get score of bad word '%s'", word);
 	int data = 0;
 
