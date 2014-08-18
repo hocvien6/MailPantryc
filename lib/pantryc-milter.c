@@ -287,15 +287,15 @@ static void pantryc_milter__write_message_to_log(data, message)
 	fprintf(pantryc_global__log_file, "From:\t\t%s\n",
 			g_mime_message_get_sender(message));
 
-	value = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_TO);
+	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_TO);
 	fprintf(pantryc_global__log_file, "To:\t\t\t%s\n",
 			value ? value : "<none>");
 
-	value = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_CC);
+	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_CC);
 	fprintf(pantryc_global__log_file, "Cc:\t\t\t%s\n",
 			value ? value : "<none>");
 
-	value = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_BCC);
+	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_BCC);
 	fprintf(pantryc_global__log_file, "Bcc:\t\t%s\n", value ? value : "<none>");
 
 	value = g_mime_message_get_subject(message);

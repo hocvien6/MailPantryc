@@ -4,18 +4,18 @@
 
 #include "../include/pantryc-scanner.h"
 
-gchar* pantryc_scanner__get_recip(message, type)
+gchar* pantryc_scanner__get_recipient(message, type)
 	GMimeMessage *message;GMimeRecipientType type; {
-	char *recip;
-	InternetAddressList *receps;
-	receps = g_mime_message_get_recipients(message, type);
-	recip = (char*) internet_address_list_to_string(receps, FALSE);
-	if (!recip || !*recip) {
-		g_free(recip);
+	char *recipient;
+	InternetAddressList *recipients;
+	recipients = g_mime_message_get_recipients(message, type);
+	recipient = (char*) internet_address_list_to_string(recipients, FALSE);
+	if (!recipient || !*recipient) {
+		g_free(recipient);
 		return NULL;
 	}
 
-	return recip;
+	return recipient;
 }
 
 gchar* pantryc_scanner__get_date(message)

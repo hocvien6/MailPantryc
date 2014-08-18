@@ -8,7 +8,7 @@
  * @type:			type of header: to, cc, or bcc...
  * return			recipients
  */
-gchar* pantryc_scanner__get_recip(GMimeMessage *message,
+gchar* pantryc_scanner__get_recipient(GMimeMessage *message,
 		GMimeRecipientType type);
 
 /**
