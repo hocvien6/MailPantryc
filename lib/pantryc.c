@@ -18,9 +18,19 @@ void pantryc__learn_insert_rejected_receipt_address(address)
 	pantryc_sqlite__insert_rejected_receipt_address(address);
 }
 
+void pantryc__learn_delete_rejected_receipt_address(address)
+	char* address; {
+	pantryc_sqlite__delete_rejected_receipt_address(address);
+}
+
 void pantryc__learn_insert_bad_word(word, score)
 	char *word;int score; {
 	pantryc_sqlite__insert_bad_word(word, score);
+}
+
+void pantryc__learn_delete_bad_word(word)
+	char *word; {
+	pantryc_sqlite__delete_bad_word(word);
 }
 
 int pantryc__work(argc, argv)

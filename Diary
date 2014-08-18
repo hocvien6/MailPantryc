@@ -136,3 +136,5 @@ Fri 08/15/2014:
 Mon 08/16/2014:
 - Fix bug cannot add column on table "Word"
 - Modify function pantryc_scanner__get_content, pantryc_scanner__read_attachment: reset stream before reading
+- Write function: pantryc__learn_delete_rejected_receipt_address, pantryc__learn_delete_bad_word
+	(pantryc)
