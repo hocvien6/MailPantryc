@@ -333,17 +333,18 @@ static int pantryc_milter__calculate_score_content(gchar *content) {
 		if (isspace(seeker[i])) {
 			lastchar = seeker[i];
 			seeker[i] = '\0';
-			printf("previous: %s\n", previous); // TESTING
+			score += pantryc_sqlite__get_score_bad_word(previous);
 		} else {
-			if (isspace(lastchar)) {
+			if (isspace(lastchar))
 				previous = seeker + i;
-				score += pantryc_sqlite__get_score_bad_word(previous);
-			}
 			lastchar = seeker[i];
 		}
 		i++;
-	} while (seeker[i] != '\0');
-	printf("previous: %s\n", previous); // TESTING
+		if (seeker[i] == '\0') { // last word
+			score += pantryc_sqlite__get_score_bad_word(previous);
+			break;
+		}
+	} while (1);
 
 	return score;
 }

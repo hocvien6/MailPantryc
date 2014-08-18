@@ -178,7 +178,7 @@ int pantryc_sqlite__get_score_bad_word(word)
 	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
 	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
 	char *error;
-	sprintf(sql, "select " PANTRYC_SQLITE__COLUMN_WORD_BAD
+	sprintf(sql, "select " PANTRYC_SQLITE__COLUMN_WORD_SCORE
 	" from " PANTRYC_SQLITE__TABLE_WORD
 	" where " PANTRYC_SQLITE__COLUMN_WORD_BAD " = '%s';", word);
 	sprintf(failure, "Cannot get score of bad word '%s'", word);
@@ -195,6 +195,7 @@ int pantryc_sqlite__get_score_bad_word(word)
 	if (result != SQLITE_OK)
 		return pFALSE;
 	data = data > 0 ? data : 0;
+
 	return data;
 }
 
