@@ -328,11 +328,12 @@ static int pantryc_milter__calculate_score_content(gchar *content) {
 
 	previous = seeker;
 	lastchar = ' ';
-	for (i = 0; seeker[i] != '\0'; i++) {
+	i = 0;
+	do {
 		if (isspace(seeker[i])) {
 			lastchar = seeker[i];
 			seeker[i] = '\0';
-			printf("previous: %s\n",previous); // TESTING
+			printf("previous: %s\n", previous); // TESTING
 		} else {
 			if (isspace(lastchar)) {
 				previous = seeker + i;
@@ -340,7 +341,9 @@ static int pantryc_milter__calculate_score_content(gchar *content) {
 			}
 			lastchar = seeker[i];
 		}
-	}
+		i++;
+	} while (seeker[i] != '\0');
+	printf("previous: %s\n", previous); // TESTING
 
 	return score;
 }
