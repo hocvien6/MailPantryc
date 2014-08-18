@@ -192,13 +192,6 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		g_warning("failed to construct message");
 	}
 	pantryc_milter__write_message_to_log(data, message);
-	// TESTING
-	const gchar* content = pantryc_scanner__get_content(message, 0);
-	printf("Content: '%s'\n", content);
-	int score = pantryc_milter__calculate_score_content(
-			pantryc_scanner__get_content(message, 0));
-	printf("score: %d\n", score);
-	////
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(
 				(GMimeMultipart*) message->mime_part);
@@ -290,33 +283,41 @@ static void pantryc_milter__free_pantrycData(data)
 
 static void pantryc_milter__write_message_to_log(data, message)
 	PantrycData *data;GMimeMessage *message; {
-	const gchar *val;
+	const gchar *value;
 	fprintf(pantryc_global__log_file, "From:\t\t%s\n",
 			g_mime_message_get_sender(message));
 
-	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_TO);
-	fprintf(pantryc_global__log_file, "To:\t\t\t%s\n", val ? val : "<none>");
+	value = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_TO);
+	fprintf(pantryc_global__log_file, "To:\t\t\t%s\n",
+			value ? value : "<none>");
 
-	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_CC);
-	fprintf(pantryc_global__log_file, "Cc:\t\t\t%s\n", val ? val : "<none>");
+	value = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_CC);
+	fprintf(pantryc_global__log_file, "Cc:\t\t\t%s\n",
+			value ? value : "<none>");
 
-	val = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_BCC);
-	fprintf(pantryc_global__log_file, "Bcc:\t\t%s\n", val ? val : "<none>");
+	value = pantryc_scanner__get_recip(message, GMIME_RECIPIENT_TYPE_BCC);
+	fprintf(pantryc_global__log_file, "Bcc:\t\t%s\n", value ? value : "<none>");
 
-	val = g_mime_message_get_subject(message);
-	fprintf(pantryc_global__log_file, "Subject:\t%s\n", val ? val : "<none>");
+	value = g_mime_message_get_subject(message);
+	fprintf(pantryc_global__log_file, "Subject:\t%s\n",
+			value ? value : "<none>");
 
-	val = pantryc_scanner__get_date(message);
-	fprintf(pantryc_global__log_file, "Date:\t\t%s\n", val);
+	value = pantryc_scanner__get_date(message);
+	fprintf(pantryc_global__log_file, "Date:\t\t%s\n", value);
 
-	val = pantryc_scanner__get_content(message, 0);
-	fprintf(pantryc_global__log_file, "Message:\t\"%s\"\n", val);
+	value = pantryc_scanner__get_content(message, 0);
+	fprintf(pantryc_global__log_file, "Message:\t\"%s\"\n", value);
 
-	val = g_mime_message_get_message_id(message);
-	fprintf(pantryc_global__log_file, "Msg-id:\t\t%s\n", val ? val : "<none>");
+	fprintf(pantryc_global__log_file, "Score:\t\t%d\n",
+			pantryc_milter__calculate_score_content((gchar*) value));
 
-	val = pantryc_scanner__get_references(message);
-	fprintf(pantryc_global__log_file, "Refs:\t\t%s\n", val ? val : "<none>");
+	value = g_mime_message_get_message_id(message);
+	fprintf(pantryc_global__log_file, "Msg-id:\t\t%s\n",
+			value ? value : "<none>");
+
+	value = pantryc_scanner__get_references(message);
+	fprintf(pantryc_global__log_file, "Refs:\t\t%s\n",
+			value ? value : "<none>");
 }
 
 static int pantryc_milter__calculate_score_content(gchar *content) {
