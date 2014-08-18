@@ -3,16 +3,19 @@
 
 #include "../include/pantryc-sqlite.h"
 
+/* Pantryc Database default name */
 #define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
+/* Table "Address" with column "RejectedReceipt" */
 #define PANTRYC_SQLITE__TABLE_ADDRESS							"Address"
 #define PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT			"RejectedReceipt"
+/* Table "Word" with 2 columns "Bad" and "Score" */
 #define PANTRYC_SQLITE__TABLE_WORD								"Word"
 #define PANTRYC_SQLITE__COLUMN_WORD_BAD							"Bad"
 #define PANTRYC_SQLITE__COLUMN_WORD_SCORE						"Score"
 
 #define PANTRYC_SQLITE__TEXT_LENGTH								"50"
 
-#define PANTRYC_SQLITE__SQL_LENGTH 200
+#define PANTRYC_SQLITE__SQL_LENGTH								200
 #define PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(message)			\
 	char *message = (char*) malloc(sizeof(char) * PANTRYC_SQLITE__SQL_LENGTH)
 
@@ -121,6 +124,9 @@ void pantryc_sqlite__insert_bad_word(word, score)
 		pantryc_sqlite__initialize(
 		PANTRYC_SQLITE__TABLE_WORD,
 		PANTRYC_SQLITE__COLUMN_WORD_BAD);
+		pantryc_sqlite__initialize(
+		PANTRYC_SQLITE__TABLE_WORD,
+		PANTRYC_SQLITE__COLUMN_WORD_SCORE);
 
 		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
 		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(success);
@@ -129,7 +135,7 @@ void pantryc_sqlite__insert_bad_word(word, score)
 		sprintf(sql,
 				"insert into " PANTRYC_SQLITE__TABLE_WORD
 				" (" PANTRYC_SQLITE__COLUMN_WORD_BAD ", " PANTRYC_SQLITE__COLUMN_WORD_SCORE ")"
-				" values ('%s, %d')", word, score);
+				" values ('%s', %d);", word, score);
 		sprintf(success,
 				"Add word '%s' with score %d to column \"" PANTRYC_SQLITE__COLUMN_WORD_BAD
 				"\" on table \"" PANTRYC_SQLITE__TABLE_WORD "\"", word, score);
@@ -144,6 +150,9 @@ void pantryc_sqlite__delete_bad_word(word)
 		pantryc_sqlite__initialize(
 		PANTRYC_SQLITE__TABLE_WORD,
 		PANTRYC_SQLITE__COLUMN_WORD_BAD);
+		pantryc_sqlite__initialize(
+		PANTRYC_SQLITE__TABLE_WORD,
+		PANTRYC_SQLITE__COLUMN_WORD_SCORE);
 
 		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(sql);
 		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(success);
@@ -212,13 +221,16 @@ static void pantryc_sqlite__initialize(table, column)
 				table);
 		if (strcmp(table, PANTRYC_SQLITE__TABLE_ADDRESS) == 0) {
 			/* Create table "Address" */
-			sprintf(sql,
-					"create table %s (" PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT
-					" char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique);", table);
+			sprintf(sql, "create table %s ("
+			PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT
+			" char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique);", table);
 		} else if (strcmp(table, PANTRYC_SQLITE__TABLE_WORD) == 0) {
 			/* Create table "Word" */
-			sprintf(sql, "create table %s (" PANTRYC_SQLITE__COLUMN_WORD_BAD
-			" char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique);", table);
+			sprintf(sql, "create table %s ("
+			PANTRYC_SQLITE__COLUMN_WORD_BAD
+			" char(" PANTRYC_SQLITE__TEXT_LENGTH ") unique, "
+			PANTRYC_SQLITE__COLUMN_WORD_SCORE
+			" int);", table);
 		} else
 			return;
 
@@ -236,16 +248,21 @@ static void pantryc_sqlite__initialize(table, column)
 				column);
 		if (strcmp(column, PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT)
 				== 0) {
-			/* Add column "RejectedReceipt" */
+			/* Add column "RejectedReceipt" table "Address" */
 			sprintf(sql, "alter table " PANTRYC_SQLITE__TABLE_ADDRESS
 			" add column %s char(" PANTRYC_SQLITE__TEXT_LENGTH ");", column); // still not unique
 		} else if (strcmp(column,
-				PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT) == 0) {
-			/* Add column "Score" */
+		PANTRYC_SQLITE__COLUMN_WORD_BAD) == 0) {
+			/* Add column "Bad" table "Word" */
 			sprintf(sql, "alter table " PANTRYC_SQLITE__TABLE_WORD
 			" add column %s char(" PANTRYC_SQLITE__TEXT_LENGTH ");", column); // still not unique
-		}
-		return;
+		} else if (strcmp(column,
+		PANTRYC_SQLITE__COLUMN_WORD_SCORE) == 0) {
+			/* Add column "Score" table "Word" */
+			sprintf(sql, "alter table " PANTRYC_SQLITE__TABLE_WORD
+			" add column %s int;", column); // still not unique
+		} else
+			return; // do not forget `else return;' statement here!!!
 
 		sprintf(success, "Add column \"%s\""
 				" on table \"%s\"", column, table);

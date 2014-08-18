@@ -71,12 +71,13 @@ gchar* pantryc_scanner__get_content(message, index)
 	GMimeStream *stream = g_mime_data_wrapper_get_stream(
 			g_mime_part_get_content_object(part));
 	gint64 length = g_mime_stream_length(stream);
+	if (g_mime_stream_eos(stream))
+		g_mime_stream_reset(stream);
 	gchar *content = (gchar*) malloc(sizeof(gchar) * (length + 1));
 	g_mime_stream_read(stream, content, length);
 
 	// TODO cut off the tail, modify appropriate index of the last character
 	content[length - 2] = '\0';
-
 	return content;
 }
 
@@ -127,6 +128,8 @@ FILE* pantryc_scanner__read_attachment(message, index)
 	GMimeStream *stream = g_mime_data_wrapper_get_stream(
 			g_mime_part_get_content_object(part));
 	gint64 length = g_mime_stream_length(stream);
+	if (g_mime_stream_eos(stream))
+		g_mime_stream_reset(stream);
 	char *content = (char*) malloc(sizeof(char) * length);
 	g_mime_stream_read(stream, content, length);
 

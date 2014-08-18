@@ -131,3 +131,8 @@ Fri 08/15/2014:
 - NOTE: callback function isn't be called if sqlite3_exec run successfully but return no result
 	--> spamie afternoon!!! I hate sqlite3!!!
 - Start writing function to calculate score of message content base on word database
+
+========== WEEK 6 ==========
+Mon 08/16/2014:
+- Fix bug cannot add column on table "Word"
+- Modify function pantryc_scanner__get_content, pantryc_scanner__read_attachment: reset stream before reading
