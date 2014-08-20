@@ -53,7 +53,8 @@ void pantryc_environment__change_required_score(score)
 }
 
 void pantryc_environment__create_log_file() {
-	/* TODO rename and change open mode of #pe_log file */
+	/* TODO rename and change open mode of log file */
+	$pTag_log
 	char *filename = (char*) malloc(
 			sizeof(char)
 					* (strlen(pantryc_environment__working_directory)

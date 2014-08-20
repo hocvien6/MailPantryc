@@ -5,7 +5,7 @@
 
 #include <pantryc-util.h>
 
-/* Global variable, used at pantryc-milter.c and pantryc-sqlite.c */
+/* Global variable, used at pantryc-milter.c and pantryc-environment.c */
 char *pantryc_environment__working_directory;
 int pantryc_environment__attachment_permission;
 int pantryc_environment__required_score;

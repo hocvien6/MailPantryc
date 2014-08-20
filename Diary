@@ -142,3 +142,5 @@ Mon 08/18/2014:
 Wed 08/20/2014:
 - Write function: pantryc_util__to_lower
 	(pantryc-util)
+- Add tag: $pTag_log, $pTag_milter
+- Add header to mail: write score and specify mail is spam or not

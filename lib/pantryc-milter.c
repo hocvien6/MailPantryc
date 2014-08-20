@@ -200,7 +200,8 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		pERROR "Failed to construct message");
 	}
 
-	/* Write information to #pe_log file and modify message */
+	/* Write information to log file and modify message */
+	$pTag_log
 	pantryc_milter__write_message_to_log(data, message);
 	char score[PANTRYC_MILTER__LENGTH_OF_HEADER];
 	sprintf(score, "%d", pantryc_milter__score);

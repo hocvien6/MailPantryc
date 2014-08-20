@@ -3,84 +3,86 @@
 
 #include <libmilter/mfapi.h>
 
+#include <pantryc-util.h>
+
 /**
- * #pm_function
  * Connection info filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_connect(SMFICTX *context, char *hostname,
 _SOCK_ADDR *hostaddr);
 
 /**
- * #pm_function
  * SMTP HELO command filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_helo(SMFICTX *context, char *helohost);
 
 /**
- * #pm_function
  * Envelope sender filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_envfrom(SMFICTX *context, char **argv);
 
 /**
- * #pm_function
  * Envelope recipient filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_envrcpt(SMFICTX *context, char **argv);
 
 /**
- * #pm_function
  * Header filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_header(SMFICTX *context, char *name, char *value);
 
 /**
- * #pm_function
  * End of header
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_eoh(SMFICTX *context);
 
 /**
- * #pm_function
  * Body block
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_body(SMFICTX *context, unsigned char *bodyp,
 		size_t bodylen);
 
 /**
- * #pm_function
  * End of message
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_eom(SMFICTX *context);
 
 /**
- * #pm_function
  * Message abort
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_abort(SMFICTX *context);
 
 /**
- * #pm_function
  * Connection cleanup
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_close(SMFICTX *context);
 
 /**
- * #pm_function
  * Any unrecognized or unimplemented command filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_unknown(SMFICTX *context, const char *command);
 
 /**
- * #pm_function
  * SMTP DATA command filter
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_data(SMFICTX *context);
 
 /**
- * #pm_function
  * Negotiation callback
  */
+$pTag_milter
 sfsistat pantryc_milter__xxfi_negotiate(SMFICTX *context, unsigned long f0,
 		unsigned long f1, unsigned long f2, unsigned long f3,
 		unsigned long *pf0, unsigned long *pf1, unsigned long *pf2,
