@@ -5,9 +5,11 @@
 
 #include <pantryc-util.h>
 
+/* Global variable, used at pantryc-milter.c and pantryc-sqlite.c */
 char *pantryc_environment__working_directory;
-FILE *pantryc_environment__log_file;
 int pantryc_environment__attachment_permission;
+int pantryc_environment__required_score;
+FILE *pantryc_environment__log_file;
 
 /**
  * Change working directory of pantryc milter
@@ -20,6 +22,12 @@ void pantryc_environment__change_working_directory(const char *directory);
  * @permission:		mode of permission (ex: 0644, 0755...)
  */
 void pantryc_environment__change_attachment_permission(const int permission);
+
+/**
+ * Set required score to decide mail is ham or spam
+ * @score			required score to set as threshold
+ */
+void pantryc_environment__change_required_score(const int score);
 
 /**
  * Create log file

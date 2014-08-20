@@ -47,8 +47,13 @@ void pantryc_environment__change_attachment_permission(permission)
 	pantryc_environment__attachment_permission = permission;
 }
 
+void pantryc_environment__change_required_score(score)
+	const int score; {
+	pantryc_environment__required_score = score;
+}
+
 void pantryc_environment__create_log_file() {
-	/* TODO rename log file, #pe_log; change log file mode */
+	/* TODO rename and change open mode of #pe_log file */
 	char *filename = (char*) malloc(
 			sizeof(char)
 					* (strlen(pantryc_environment__working_directory)

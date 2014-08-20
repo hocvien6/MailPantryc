@@ -10,6 +10,8 @@
 #include "../include/pantryc-environment.h"
 
 #define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(context))
+#define	PANTRYC_MILTER__LENGTH_OF_HEADER			50
+#define	PANTRYC_MILTER__HEADER_SCORE				"X-Pantryc-Score"
 
 typedef struct {
 	char *buffer;
@@ -190,17 +192,26 @@ sfsistat pantryc_milter__xxfi_eom(context)
 	parser = g_mime_parser_new_with_stream(stream);
 	if (!parser) {
 		fprintf(pantryc_environment__log_file,
-				pERROR "Failed to create parser");
+		pERROR "Failed to create parser");
 	}
 	message = g_mime_parser_construct_message(parser);
 	if (!message) {
 		fprintf(pantryc_environment__log_file,
-				pERROR "Failed to construct message");
+		pERROR "Failed to construct message");
 	}
 
-	/* Write information to #pe_log and modify message */
+	/* Write information to #pe_log file and modify message */
 	pantryc_milter__write_message_to_log(data, message);
-
+	char score[PANTRYC_MILTER__LENGTH_OF_HEADER];
+	sprintf(score, "%d", pantryc_milter__score);
+	if (pantryc_milter__score > pantryc_environment__required_score)
+		strcat(score, " *****SPAM*****");
+	if (smfi_addheader(context, PANTRYC_MILTER__HEADER_SCORE,
+			score) != MI_SUCCESS) {
+		fprintf(pantryc_environment__log_file,
+		pERROR "Couldn't add header: " PANTRYC_MILTER__HEADER_SCORE);
+		return SMFIS_TEMPFAIL;
+	}
 
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(

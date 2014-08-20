@@ -5,10 +5,12 @@
  * Born
  * @directory:		where extract attachments and store log file for each message
  * @permission:		mode of permission (ex: 0644, 0755...)
+ * @score:			required score
  * @port:			port to set (ex: f1.sock...)
  * @timeout:		time out
  */
-int pantryc__born(const char *directory, const int permission, char *port, char *timeout);
+int pantryc__born(const char *directory, const int permission, const int score,
+		char *port, char *timeout);
 
 /**
  * Learn how to add a rejected receipt address

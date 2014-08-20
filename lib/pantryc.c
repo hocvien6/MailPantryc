@@ -2,10 +2,11 @@
 #include "../include/pantryc-environment.h"
 #include "../include/pantryc-sqlite.h"
 
-int pantryc__born(directory, permission, port, timeout)
-	const char *directory;const int permission;char *port;char *timeout; {
+int pantryc__born(directory, permission, score, port, timeout)
+	const char *directory;const int permission;const int score;char *port;char *timeout; {
 	pantryc_environment__change_working_directory(directory);
 	pantryc_environment__change_attachment_permission(permission);
+	pantryc_environment__change_required_score(score);
 	pBOOL setport = pantryc_environment__set_port(port);
 	pBOOL settimeout = pantryc_environment__set_timeout(timeout);
 
