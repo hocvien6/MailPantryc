@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 #include "../include/pantryc-sqlite.h"
+#include "../include/pantryc-environment.h"
 
 /* Pantryc Database default name */
 #define PANTRYC_SQLITE__DATABASE								"PantrycDatabase.db"
@@ -29,14 +29,14 @@ pBOOL pantryc_sqlite__open_database() {
 	int result;
 	char *filename = (char*) malloc(
 			sizeof(char)
-					* (strlen(pantryc_global__working_directory)
+					* (strlen(pantryc_environment__working_directory)
 							+ strlen(PANTRYC_SQLITE__DATABASE) + 1));
 	sprintf(filename, "%s" PANTRYC_SQLITE__DATABASE,
-			pantryc_global__working_directory);
+			pantryc_environment__working_directory);
 	result = sqlite3_open(filename, &pantryc_sqlite__database);
 
 	if (result) {
-		fprintf(pantryc_global__log_file,
+		fprintf(pantryc_environment__log_file,
 				"**ERROR**\tCannot open database " PANTRYC_SQLITE__DATABASE "\n");
 		pantryc_sqlite__database = NULL;
 		return pFALSE;
@@ -133,6 +133,8 @@ void pantryc_sqlite__insert_bad_word(word, score)
 		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(success);
 		PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
 		char *error;
+
+		word = pantryc_util__to_lower(word);
 		sprintf(sql,
 				"insert into " PANTRYC_SQLITE__TABLE_WORD
 				" (" PANTRYC_SQLITE__COLUMN_WORD_BAD ", " PANTRYC_SQLITE__COLUMN_WORD_SCORE ")"
@@ -180,9 +182,6 @@ int pantryc_sqlite__get_score_bad_word(word)
 	PANTRYC_SQLITE__INITIALZE_QUERY_MESSAGE(failure);
 	char *error;
 
-	int i = -1;
-	while (word[i++] != '\0')
-		word[i] = tolower(word[i]);
 	sprintf(sql, "select " PANTRYC_SQLITE__COLUMN_WORD_SCORE
 	" from " PANTRYC_SQLITE__TABLE_WORD
 	" where " PANTRYC_SQLITE__COLUMN_WORD_BAD " = '%s' collate nocase;", word);
@@ -223,8 +222,8 @@ static void pantryc_sqlite__initialize(table, column)
 
 	/* No such table */
 	if (result != SQLITE_OK) {
-		fprintf(pantryc_global__log_file, "**NOTICE**\tNo such table \"%s\"\n",
-				table);
+		fprintf(pantryc_environment__log_file,
+				"**NOTICE**\tNo such table \"%s\"\n", table);
 		if (strcmp(table, PANTRYC_SQLITE__TABLE_ADDRESS) == 0) {
 			/* Create table "Address" */
 			sprintf(sql, "create table %s ("
@@ -250,8 +249,8 @@ static void pantryc_sqlite__initialize(table, column)
 	result = sqlite3_exec(pantryc_sqlite__database, sql, NULL, NULL, &error);
 	/* No such column */
 	if (result != SQLITE_OK) {
-		fprintf(pantryc_global__log_file, "**NOTICE**\tNo such column \"%s\"\n",
-				column);
+		fprintf(pantryc_environment__log_file,
+				"**NOTICE**\tNo such column \"%s\"\n", column);
 		if (strcmp(column, PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT)
 				== 0) {
 			/* Add column "RejectedReceipt" table "Address" */
@@ -284,11 +283,12 @@ static int pantryc_sqlite__execute(sql, callback, data, success, failure, error)
 			error);
 	if (result == SQLITE_OK) {
 		if (success != NULL)
-			fprintf(pantryc_global__log_file, "**SUCCESS**\t%s\n", success);
+			fprintf(pantryc_environment__log_file, "**SUCCESS**\t%s\n",
+					success);
 	} else {
 		if (failure != NULL)
-			fprintf(pantryc_global__log_file, "**ERROR**\t%s, %s\n", failure,
-					*error);
+			fprintf(pantryc_environment__log_file, "**ERROR**\t%s, %s\n",
+					failure, *error);
 		sqlite3_free(*error);
 	}
 	return result;

@@ -133,8 +133,12 @@ Fri 08/15/2014:
 - Start writing function to calculate score of message content base on word database
 
 ========== WEEK 6 ==========
-Mon 08/16/2014:
+Mon 08/18/2014:
 - Fix bug cannot add column on table "Word"
 - Modify function pantryc_scanner__get_content, pantryc_scanner__read_attachment: reset stream before reading
 - Write function: pantryc__learn_delete_rejected_receipt_address, pantryc__learn_delete_bad_word
 	(pantryc)
+	
+Wed 08/20/2014:
+- Write function: pantryc_util__to_lower
+	(pantryc-util)

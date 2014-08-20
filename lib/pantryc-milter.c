@@ -5,6 +5,9 @@
 #include <gmime/gmime.h>
 
 #include "../include/pantryc-milter.h"
+#include "../include/pantryc-scanner.h"
+#include "../include/pantryc-sqlite.h"
+#include "../include/pantryc-environment.h"
 
 typedef struct {
 	char *buffer;
@@ -117,7 +120,7 @@ sfsistat pantryc_milter__xxfi_envrcpt(context, argv)
 	char *rcptaddr = smfi_getsymval(context, "{rcpt_addr}");
 	/* log this recipient */
 	if (pantryc_sqlite__check_rejected_receipt_address_list(rcptaddr)) {
-		if (fprintf(pantryc_global__log_file, "RCPT %s -- REJECTED\n",
+		if (fprintf(pantryc_environment__log_file, "RCPT %s -- REJECTED\n",
 				rcptaddr) == EOF) {
 			(void) pantryc_milter__cleanup(context, pFALSE);
 			return SMFIS_TEMPFAIL;
@@ -157,7 +160,7 @@ sfsistat pantryc_milter__xxfi_body(context, bodyp, bodylen)
 	/* output body block to mail file */
 	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
-		fprintf(pantryc_global__log_file, "Couldn't write file (error: %s)\n",
+		fprintf(pantryc_environment__log_file, "Couldn't write file (error: %s)\n",
 				strerror(errno));
 		(void) pantryc_milter__cleanup(context, pFALSE);
 		return SMFIS_TEMPFAIL;
@@ -198,8 +201,8 @@ sfsistat pantryc_milter__xxfi_eom(context)
 		int i;
 		for (i = 0; i <= number_of_parts - 1; i++) {
 			pantryc_scanner__extract_attachment(message, i,
-					pantryc_global__attachment_permission,
-					pantryc_global__working_directory);
+					pantryc_environment__attachment_permission,
+					pantryc_environment__working_directory);
 		}
 	}
 
@@ -255,14 +258,14 @@ static sfsistat pantryc_milter__cleanup(context, ok)
 			snprintf(host, sizeof host, "localhost");
 	} else {
 		// message was aborted -- delete the archive file
-		fprintf(pantryc_global__log_file, "Message aborted. Removing file\n");
+		fprintf(pantryc_environment__log_file, "Message aborted. Removing file\n");
 		status = SMFIS_TEMPFAIL;
 	}
 
 	/* close the archive file */
 	if (data->mail != NULL && fclose(data->mail) == EOF) {
 		/* failed; we have to wait until later */
-		fprintf(pantryc_global__log_file,
+		fprintf(pantryc_environment__log_file,
 				"Couldn't close archive file (error: %s)\n", strerror(errno));
 		status = SMFIS_TEMPFAIL;
 	}
@@ -284,39 +287,39 @@ static void pantryc_milter__free_pantrycData(data)
 static void pantryc_milter__write_message_to_log(data, message)
 	PantrycData *data;GMimeMessage *message; {
 	const gchar *value;
-	fprintf(pantryc_global__log_file, "From:\t\t%s\n",
+	fprintf(pantryc_environment__log_file, "From:\t\t%s\n",
 			g_mime_message_get_sender(message));
 
 	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_TO);
-	fprintf(pantryc_global__log_file, "To:\t\t\t%s\n",
+	fprintf(pantryc_environment__log_file, "To:\t\t\t%s\n",
 			value ? value : "<none>");
 
 	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_CC);
-	fprintf(pantryc_global__log_file, "Cc:\t\t\t%s\n",
+	fprintf(pantryc_environment__log_file, "Cc:\t\t\t%s\n",
 			value ? value : "<none>");
 
 	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_BCC);
-	fprintf(pantryc_global__log_file, "Bcc:\t\t%s\n", value ? value : "<none>");
+	fprintf(pantryc_environment__log_file, "Bcc:\t\t%s\n", value ? value : "<none>");
 
 	value = g_mime_message_get_subject(message);
-	fprintf(pantryc_global__log_file, "Subject:\t%s\n",
+	fprintf(pantryc_environment__log_file, "Subject:\t%s\n",
 			value ? value : "<none>");
 
 	value = pantryc_scanner__get_date(message);
-	fprintf(pantryc_global__log_file, "Date:\t\t%s\n", value);
+	fprintf(pantryc_environment__log_file, "Date:\t\t%s\n", value);
 
 	value = pantryc_scanner__get_content(message, 0);
-	fprintf(pantryc_global__log_file, "Message:\t\"%s\"\n", value);
+	fprintf(pantryc_environment__log_file, "Message:\t\"%s\"\n", value);
 
-	fprintf(pantryc_global__log_file, "Score:\t\t%d\n",
+	fprintf(pantryc_environment__log_file, "Score:\t\t%d\n",
 			pantryc_milter__calculate_score_content((gchar*) value));
 
 	value = g_mime_message_get_message_id(message);
-	fprintf(pantryc_global__log_file, "Msg-id:\t\t%s\n",
+	fprintf(pantryc_environment__log_file, "Msg-id:\t\t%s\n",
 			value ? value : "<none>");
 
 	value = pantryc_scanner__get_references(message);
-	fprintf(pantryc_global__log_file, "Refs:\t\t%s\n",
+	fprintf(pantryc_environment__log_file, "Refs:\t\t%s\n",
 			value ? value : "<none>");
 }
 

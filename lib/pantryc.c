@@ -1,5 +1,6 @@
 #include "../include/pantryc.h"
 #include "../include/pantryc-environment.h"
+#include "../include/pantryc-sqlite.h"
 
 int pantryc__born(directory, permission, port, timeout)
 	const char *directory;const int permission;char *port;char *timeout; {

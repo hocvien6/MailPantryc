@@ -14,7 +14,6 @@ gchar* pantryc_scanner__get_recipient(message, type)
 		g_free(recipient);
 		return NULL;
 	}
-
 	return recipient;
 }
 
@@ -34,7 +33,6 @@ gchar* pantryc_scanner__get_date(message)
 		sprintf(date, "%s (%s%04d)", buf, timezone < 0 ? "-" : "+", timezone);
 		return date;
 	}
-
 	return NULL;
 }
 
@@ -59,7 +57,6 @@ gchar* pantryc_scanner__get_references(message)
 				references ? "," : "", id);
 	}
 	g_mime_references_free(mime_refs);
-
 	return references;
 }
 

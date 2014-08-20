@@ -3,9 +3,6 @@
 
 #include <libmilter/mfapi.h>
 
-#include <pantryc-scanner.h>
-#include <pantryc-sqlite.h>
-
 /**
  * #Pantryc_milter_structure_function
  * Connection info filter

@@ -1,13 +1,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
+#include <unistd.h>
 #include <libmilter/mfapi.h>
 
+#include "../include/pantryc-milter.h"
 #include "../include/pantryc-environment.h"
 
-static pBOOL pantryc_environment__setport = pFALSE;
+#define PANTRYC_ENVIRONMENT__LOG_FILE	"log.txt"
 
-pantrycMilter pantryc_environment__milter = { "PantrycMilter", /* filter name */
+typedef struct smfiDesc pantrycMilter; /* structure mail filter Describe */
+
+static pBOOL pantryc_environment__setport = pFALSE;
+static pantrycMilter pantryc_environment__milter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
 SMFIF_ADDHDRS | SMFIF_ADDRCPT,
 /* flags */
@@ -25,6 +30,42 @@ pantryc_milter__xxfi_unknown, /* unknown SMTP commands */
 pantryc_milter__xxfi_data, /* DATA command */
 pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 };
+
+void pantryc_global__change_working_directory(directory)
+	const char *directory; {
+	if (directory != NULL) {
+		if (pantryc_environment__working_directory != NULL) {
+			free(pantryc_environment__working_directory);
+		}
+		pantryc_environment__working_directory = (char*) malloc(
+				(strlen(directory) + 1) * sizeof(char));
+		strcpy(pantryc_environment__working_directory, directory);
+	}
+}
+
+void pantryc_global__change_attachment_permission(permission)
+	const int permission; {
+	pantryc_environment__attachment_permission = permission;
+}
+
+void pantryc_global__create_log_file() {
+	// TESTING TODO rename log file, #filename; change log file mode
+	char *filename = (char*) malloc(
+			sizeof(char)
+					* (strlen(pantryc_environment__working_directory)
+							+ strlen(PANTRYC_ENVIRONMENT__LOG_FILE) + 1));
+	strcpy(filename, pantryc_environment__working_directory);
+	strcat(filename, PANTRYC_ENVIRONMENT__LOG_FILE);
+	pantryc_environment__log_file = fopen(filename, "w+");
+}
+
+pBOOL pantryc_global__close_log_file() {
+	if (pantryc_environment__log_file != NULL
+			&& fclose(pantryc_environment__log_file) == EOF) {
+		return pFALSE;
+	}
+	return pTRUE;
+}
 
 pBOOL pantryc_environment__set_port(port)
 	char *port; {

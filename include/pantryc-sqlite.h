@@ -3,7 +3,7 @@
 
 #include <sqlite3.h>
 
-#include <pantryc-global.h>
+#include <pantryc-util.h>
 
 sqlite3 *pantryc_sqlite__database;
 
