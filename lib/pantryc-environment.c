@@ -14,8 +14,7 @@ typedef struct smfiDesc pantrycMilter; /* structure mail filter Describe */
 static pBOOL pantryc_environment__setport = pFALSE;
 static pantrycMilter pantryc_environment__milter = { "PantrycMilter", /* filter name */
 SMFI_VERSION, /* version code -- do not change */
-SMFIF_ADDHDRS | SMFIF_ADDRCPT,
-/* flags */
+SMFIF_ADDHDRS, /* flags *//* TODO insert flag to add more function pantrycMilter can do */
 pantryc_milter__xxfi_connect, /* connection info filter */
 pantryc_milter__xxfi_helo, /* SMTP HELO command filter */
 pantryc_milter__xxfi_envfrom, /* envelope sender filter */
@@ -31,7 +30,7 @@ pantryc_milter__xxfi_data, /* DATA command */
 pantryc_milter__xxfi_negotiate /* Once, at the start of each SMTP connection */
 };
 
-void pantryc_global__change_working_directory(directory)
+void pantryc_environment__change_working_directory(directory)
 	const char *directory; {
 	if (directory != NULL) {
 		if (pantryc_environment__working_directory != NULL) {
@@ -43,13 +42,13 @@ void pantryc_global__change_working_directory(directory)
 	}
 }
 
-void pantryc_global__change_attachment_permission(permission)
+void pantryc_environment__change_attachment_permission(permission)
 	const int permission; {
 	pantryc_environment__attachment_permission = permission;
 }
 
-void pantryc_global__create_log_file() {
-	// TESTING TODO rename log file, #filename; change log file mode
+void pantryc_environment__create_log_file() {
+	/* TODO rename log file, #pe_log; change log file mode */
 	char *filename = (char*) malloc(
 			sizeof(char)
 					* (strlen(pantryc_environment__working_directory)
@@ -59,7 +58,7 @@ void pantryc_global__create_log_file() {
 	pantryc_environment__log_file = fopen(filename, "w+");
 }
 
-pBOOL pantryc_global__close_log_file() {
+pBOOL pantryc_environment__close_log_file() {
 	if (pantryc_environment__log_file != NULL
 			&& fclose(pantryc_environment__log_file) == EOF) {
 		return pFALSE;

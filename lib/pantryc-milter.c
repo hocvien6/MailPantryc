@@ -9,6 +9,8 @@
 #include "../include/pantryc-sqlite.h"
 #include "../include/pantryc-environment.h"
 
+#define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(context))
+
 typedef struct {
 	char *buffer;
 	size_t size;
@@ -17,13 +19,12 @@ typedef struct {
 	FILE *mail;
 } PantrycData;
 
-#define PANTRYC_MILTER__GET_PRIVATE_DATA			((PantrycData*) smfi_getpriv(context))
-
 static sfsistat pantryc_milter__cleanup(SMFICTX *context, pBOOL ok);
 static void pantryc_milter__free_pantrycData(PantrycData *data);
 static void pantryc_milter__write_message_to_log(PantrycData *data,
 		GMimeMessage *message);
-static int pantryc_milter__calculate_score_content(gchar *content);
+static void pantryc_milter__calculate_score_content(gchar *content);
+static int pantryc_milter__score;
 
 sfsistat pantryc_milter__xxfi_connect(context, hostname, hostaddr)
 	SMFICTX *context;char *hostname;_SOCK_ADDR *hostaddr; {
@@ -160,8 +161,8 @@ sfsistat pantryc_milter__xxfi_body(context, bodyp, bodylen)
 	/* output body block to mail file */
 	if (fwrite(bodyp, bodylen, 1, data->mail) != 1) {
 		/* write failed */
-		fprintf(pantryc_environment__log_file, "Couldn't write file (error: %s)\n",
-				strerror(errno));
+		fprintf(pantryc_environment__log_file,
+				"Couldn't write file (error: %s)\n", strerror(errno));
 		(void) pantryc_milter__cleanup(context, pFALSE);
 		return SMFIS_TEMPFAIL;
 	}
@@ -178,7 +179,7 @@ sfsistat pantryc_milter__xxfi_eom(context)
 	GMimeStream *stream;
 	stream = g_mime_stream_file_new(data->mail);
 	if (!stream) {
-		g_warning("Cannot open stream");
+		fprintf(pantryc_environment__log_file, pERROR "Cannot open stream");
 	}
 
 	/* Parse the message only once at this time */
@@ -188,13 +189,19 @@ sfsistat pantryc_milter__xxfi_eom(context)
 	message = NULL;
 	parser = g_mime_parser_new_with_stream(stream);
 	if (!parser) {
-		g_warning("failed to create parser");
+		fprintf(pantryc_environment__log_file,
+				pERROR "Failed to create parser");
 	}
 	message = g_mime_parser_construct_message(parser);
 	if (!message) {
-		g_warning("failed to construct message");
+		fprintf(pantryc_environment__log_file,
+				pERROR "Failed to construct message");
 	}
+
+	/* Write information to #pe_log and modify message */
 	pantryc_milter__write_message_to_log(data, message);
+
+
 	if (GMIME_IS_MULTIPART(message->mime_part)) {
 		int number_of_parts = g_mime_multipart_get_count(
 				(GMimeMultipart*) message->mime_part);
@@ -258,7 +265,8 @@ static sfsistat pantryc_milter__cleanup(context, ok)
 			snprintf(host, sizeof host, "localhost");
 	} else {
 		// message was aborted -- delete the archive file
-		fprintf(pantryc_environment__log_file, "Message aborted. Removing file\n");
+		fprintf(pantryc_environment__log_file,
+				"Message aborted. Removing file\n");
 		status = SMFIS_TEMPFAIL;
 	}
 
@@ -299,7 +307,8 @@ static void pantryc_milter__write_message_to_log(data, message)
 			value ? value : "<none>");
 
 	value = pantryc_scanner__get_recipient(message, GMIME_RECIPIENT_TYPE_BCC);
-	fprintf(pantryc_environment__log_file, "Bcc:\t\t%s\n", value ? value : "<none>");
+	fprintf(pantryc_environment__log_file, "Bcc:\t\t%s\n",
+			value ? value : "<none>");
 
 	value = g_mime_message_get_subject(message);
 	fprintf(pantryc_environment__log_file, "Subject:\t%s\n",
@@ -311,8 +320,9 @@ static void pantryc_milter__write_message_to_log(data, message)
 	value = pantryc_scanner__get_content(message, 0);
 	fprintf(pantryc_environment__log_file, "Message:\t\"%s\"\n", value);
 
+	pantryc_milter__calculate_score_content((gchar*) value);
 	fprintf(pantryc_environment__log_file, "Score:\t\t%d\n",
-			pantryc_milter__calculate_score_content((gchar*) value));
+			pantryc_milter__score);
 
 	value = g_mime_message_get_message_id(message);
 	fprintf(pantryc_environment__log_file, "Msg-id:\t\t%s\n",
@@ -323,8 +333,8 @@ static void pantryc_milter__write_message_to_log(data, message)
 			value ? value : "<none>");
 }
 
-static int pantryc_milter__calculate_score_content(gchar *content) {
-	int score = 0;
+static void pantryc_milter__calculate_score_content(gchar *content) {
+	pantryc_milter__score = 0;
 	int i;
 	char lastchar;
 	char *previous;
@@ -337,7 +347,8 @@ static int pantryc_milter__calculate_score_content(gchar *content) {
 		if (isspace(seeker[i])) {
 			lastchar = seeker[i];
 			seeker[i] = '\0';
-			score += pantryc_sqlite__get_score_bad_word(previous);
+			pantryc_milter__score += pantryc_sqlite__get_score_bad_word(
+					previous);
 		} else {
 			if (isspace(lastchar))
 				previous = seeker + i;
@@ -345,10 +356,9 @@ static int pantryc_milter__calculate_score_content(gchar *content) {
 		}
 		i++;
 		if (seeker[i] == '\0') { // last word
-			score += pantryc_sqlite__get_score_bad_word(previous);
+			pantryc_milter__score += pantryc_sqlite__get_score_bad_word(
+					previous);
 			break;
 		}
 	} while (1);
-
-	return score;
 }

@@ -76,7 +76,7 @@ gchar* pantryc_scanner__get_content(message, index)
 	gchar *content = (gchar*) malloc(sizeof(gchar) * (length + 1));
 	g_mime_stream_read(stream, content, length);
 
-	// TODO cut off the tail, modify appropriate index of the last character
+	/* TODO cut off the tail, modify appropriate index of the last character */
 	content[length - 2] = '\0';
 	return content;
 }
@@ -137,7 +137,7 @@ FILE* pantryc_scanner__read_attachment(message, index)
 	size_t size;
 	FILE *file = open_memstream(&buffer, &size);
 
-	// TODO: write content to file stream
+	/* TODO: write content to file stream */
 
 	return file;
 }

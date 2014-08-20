@@ -13,23 +13,23 @@ int pantryc_environment__attachment_permission;
  * Change working directory of pantryc milter
  * @directory:		where extract attachments and store log file for each message
  */
-void pantryc_global__change_working_directory(const char *directory);
+void pantryc_environment__change_working_directory(const char *directory);
 
 /**
  * Change permission of extracted attachment
  * @permission:		mode of permission (ex: 0644, 0755...)
  */
-void pantryc_global__change_attachment_permission(const int permission);
+void pantryc_environment__change_attachment_permission(const int permission);
 
 /**
  * Create log file
  */
-void pantryc_global__create_log_file();
+void pantryc_environment__create_log_file();
 
 /**
  * Close log file
  */
-pBOOL pantryc_global__close_log_file();
+pBOOL pantryc_environment__close_log_file();
 
 /**
  * Set port for pantryc to connect

@@ -1,7 +1,11 @@
 #ifndef PANTRYC_UTIL_H_
 #define PANTRYC_UTIL_H_
 
-// TODO rename macro
+/* TODO rename macro */
+#define pERROR		"**ERROR**\t"
+#define pSUCCESS	"**SUCCESS**\t"
+#define pNOTICE		"**NOTICE**\t"
+
 #define pFALSE		(0)
 #define pTRUE		!pFALSE
 typedef int pBOOL;

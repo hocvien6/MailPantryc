@@ -37,7 +37,7 @@ pBOOL pantryc_sqlite__open_database() {
 
 	if (result) {
 		fprintf(pantryc_environment__log_file,
-				"**ERROR**\tCannot open database " PANTRYC_SQLITE__DATABASE "\n");
+		pERROR "Cannot open database " PANTRYC_SQLITE__DATABASE "\n");
 		pantryc_sqlite__database = NULL;
 		return pFALSE;
 	}
@@ -223,7 +223,7 @@ static void pantryc_sqlite__initialize(table, column)
 	/* No such table */
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_environment__log_file,
-				"**NOTICE**\tNo such table \"%s\"\n", table);
+		pNOTICE "No such table \"%s\"\n", table);
 		if (strcmp(table, PANTRYC_SQLITE__TABLE_ADDRESS) == 0) {
 			/* Create table "Address" */
 			sprintf(sql, "create table %s ("
@@ -250,7 +250,7 @@ static void pantryc_sqlite__initialize(table, column)
 	/* No such column */
 	if (result != SQLITE_OK) {
 		fprintf(pantryc_environment__log_file,
-				"**NOTICE**\tNo such column \"%s\"\n", column);
+		pNOTICE "No such column \"%s\"\n", column);
 		if (strcmp(column, PANTRYC_SQLITE__COLUMN_ADDRESS_REJECTED_RECEIPT)
 				== 0) {
 			/* Add column "RejectedReceipt" table "Address" */
@@ -283,12 +283,11 @@ static int pantryc_sqlite__execute(sql, callback, data, success, failure, error)
 			error);
 	if (result == SQLITE_OK) {
 		if (success != NULL)
-			fprintf(pantryc_environment__log_file, "**SUCCESS**\t%s\n",
-					success);
+			fprintf(pantryc_environment__log_file, pSUCCESS "%s\n", success);
 	} else {
 		if (failure != NULL)
-			fprintf(pantryc_environment__log_file, "**ERROR**\t%s, %s\n",
-					failure, *error);
+			fprintf(pantryc_environment__log_file, pERROR "%s, %s\n", failure,
+					*error);
 		sqlite3_free(*error);
 	}
 	return result;
